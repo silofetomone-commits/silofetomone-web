@@ -50,7 +50,7 @@ const FORM_MAJELIS = [
 ];
 
 const JEMAAT_FIELDS_PRIBADI = [
-  { name: 'noAnggota', label: 'No Anggota Keluarga Ke-', type: 'select', req: true, opts: Array.from({length:30},(_,i)=>i+1) }, { name: 'idJemaat', label: 'ID Jemaat (Otomatis)', dis: true },
+  { name: 'noAnggota', label: 'No Anggota Keluarga Ke-', type: 'select', req: true, opts: [] }, // Opts dinamis
   { name: 'namaLengkap', label: 'Nama Lengkap', req: true }, { name: 'nik', label: 'NIK' }, { name: 'jk', label: 'Jenis Kelamin', type: 'select', opts: ['Laki-laki', 'Perempuan'] },
   { name: 'goldar', label: 'Golongan Darah', type: 'select', opts: ['A', 'B', 'AB', 'O', 'Tidak Tahu'] }, { name: 'tempatLahir', label: 'Tempat Lahir' }, { name: 'tanggalLahir', label: 'Tanggal Lahir', type: 'date' },
   { name: 'alamat', label: 'Alamat Domisili Lengkap', span: 2 }, { name: 'sukuAyah', label: 'Suku Ayah' }, { name: 'sukuIbu', label: 'Suku Ibu' },
@@ -249,7 +249,7 @@ function PrintKkTemplate({ kkToPrint, jemaatData, penatuaMap, onBack }) {
        <style type="text/css">{"@page { size: landscape; margin: 10mm; }"}</style>
        <div className="flex justify-between items-center mb-4 border-b-2 border-black pb-2">
           <div><h1 className="text-xl font-bold uppercase tracking-wider">GEREJA MASEHI INJILI DI TIMOR (GMIT)</h1><h2 className="text-lg font-bold uppercase">DATA JEMAAT GMIT - SILOFETOMONE</h2></div>
-          <div className="text-right"><img src="https://imgur.com/XV3hpOH.png" alt="Logo" className="w-16 h-16 object-contain" /></div>
+          <div className="text-right"><img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-16 h-16 object-contain" /></div>
        </div>
        <div className="grid grid-cols-3 gap-2 mb-4 text-xs">
           <div>
@@ -285,14 +285,13 @@ function PrintKkTemplate({ kkToPrint, jemaatData, penatuaMap, onBack }) {
                    <td className={b}>{safeStr(ang.noAnggota || i+1)}</td><td className={b}>{safeStr(ang.gerejaBaptis)}</td><td className={b}>{toDisplayDate(ang.tanggalBaptis)}</td><td className={b}>{safeStr(ang.pendetaBaptis)}</td>
                    <td className={b}>{safeStr(ang.gerejaSidi)}</td><td className={b}>{toDisplayDate(ang.tanggalSidi)}</td><td className={b}>{safeStr(ang.pendetaSidi)}</td>
                    <td className={b}>{safeStr(ang.gerejaNikah)}</td><td className={b}>{toDisplayDate(ang.tanggalNikah)}</td><td className={b}>{safeStr(ang.pendetaNikah)}</td>
-                   <td className={b}>{Array.isArray(ang.jenisNikah) ? ang.jenisNikah.join(', ') : safeStr(ang.jenisNikah)}</td><td className={b}>{safeStr(ang.statusKeluarga)}</td><td className={b}>{(ang.jandaDuda && ang.jandaDuda !== '') ? safeStr(ang.jandaDuda) : safeStr(ang.yatimPiatu)}</td>
+                   <td className={b}>{Array.isArray(ang.jenisNikah) ? ang.jenisNikah.join(', ') : safeStr(ang.jenisNikah)}</td><td className={b}>{safeStr(ang.statusKeluarga)}</td><td className={b}>{(ang.jandaDuda && ang.jandaDuda !== 'Tidak' && ang.jandaDuda !== '') ? safeStr(ang.jandaDuda) : ((ang.yatimPiatu && ang.yatimPiatu !== 'Tidak') ? safeStr(ang.yatimPiatu) : '-')}</td>
                    <td className={b}>{safeStr(ang.jabatanJemaat)}</td>
                 </tr>
              ))}
           </tbody>
        </table>
        
-       {/* --- PERBAIKAN LAYOUT TANDA TANGAN --- */}
        <div className="flex justify-between mt-8 px-16 text-sm">
           <div className="text-center">
              <p className="mb-16">Kepala Keluarga,</p>
@@ -320,7 +319,7 @@ function PrintMajelisTemplate({ majelisToPrint, majelisData, penatuaMap, onBack 
   return (
     <div className="w-full bg-white text-black p-8 text-sm font-sans max-w-4xl mx-auto border shadow-lg print:border-none print:shadow-none print:m-0 print:p-0">
        <style type="text/css">{"@page { size: portrait; margin: 15mm; }"}</style>
-       <div className="text-center mb-6 border-b-4 border-double border-black pb-4"><img src="https://imgur.com/XV3hpOH.png" alt="Logo" className="w-20 h-20 mx-auto mb-2" /><h1 className="text-2xl font-black uppercase">PROFIL PELAYAN / MAJELIS JEMAAT</h1><h2 className="text-lg font-bold uppercase">SILOFETOMONE - RAYON {safeStr(mj.noRayon)}</h2></div>
+       <div className="text-center mb-6 border-b-4 border-double border-black pb-4"><img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-20 h-20 mx-auto mb-2" /><h1 className="text-2xl font-black uppercase">PROFIL PELAYAN / MAJELIS JEMAAT</h1><h2 className="text-lg font-bold uppercase">SILOFETOMONE - RAYON {safeStr(mj.noRayon)}</h2></div>
        <div className="flex gap-8 mb-6">
           <div className="w-1/4">
              <div className="w-32 h-40 border-2 border-black p-1 bg-gray-50 flex items-center justify-center overflow-hidden">
@@ -394,7 +393,7 @@ function PrintListTemplate({ listToPrint, tabCols, filteredData, filterRayon, fi
     <div className="block w-full bg-white text-black p-8 text-sm font-sans max-w-5xl mx-auto border shadow-lg print:border-none print:shadow-none print:m-0 print:p-0">
        <style type="text/css">{"@page { size: landscape; margin: 15mm; }"}</style>
        <div className="text-center mb-6 border-b-4 border-double border-black pb-4">
-          <img src="https://imgur.com/XV3hpOH.png" alt="Logo" className="w-20 h-20 mx-auto mb-2" />
+          <img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-20 h-20 mx-auto mb-2" />
           <h1 className="text-2xl font-black uppercase">LAPORAN DATA {safeStr(listToPrint).toUpperCase()}</h1>
           <h2 className="text-lg font-bold uppercase">SILOFETOMONE</h2>
           <p className="font-semibold mt-2">Filter: Rayon {safeStr(filterRayon)} {listToPrint === 'Pelayanan Kategori' ? `| Kategori: ${safeStr(filterKategori)}` : ''}</p>
@@ -443,7 +442,7 @@ function LoginScreen({ onLogin, penatuaMap, penatuaPassMap }) {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md border border-gray-100">
         <div className="flex flex-col items-center mb-8">
-          <img src="https://imgur.com/XV3hpOH.png" alt="Logo" className="w-24 h-24 mb-4 bg-white rounded-full shadow-sm p-1" />
+          <img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-24 h-24 mb-4 bg-white rounded-full shadow-sm p-1" />
           <h1 className="text-2xl font-black text-gray-800 text-center tracking-tight">Sistem Informasi</h1>
           <p className="text-gray-500 font-medium">SILOFETOMONE</p>
         </div>
@@ -467,7 +466,7 @@ export default function App() {
   const [majelisData, setMajelisData] = useState([]);
   const [historyData, setHistoryData] = useState([]);
   const [penatuaMap, setPenatuaMap] = useState(DEFAULT_PENATUA);
-  const [penatuaPassMap, setPenatuaPassMap] = useState({}); // State baru untuk password
+  const [penatuaPassMap, setPenatuaPassMap] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const fileInputRef = useRef(null);
   
@@ -498,9 +497,7 @@ export default function App() {
 
   useEffect(() => {
     const initAuth = async () => {
-      try {
-        await signInAnonymously(auth);
-      } catch (error) {}
+      try { await signInAnonymously(auth); } catch (error) {}
     };
     initAuth();
     return onAuthStateChanged(auth, setFirebaseUser);
@@ -513,12 +510,25 @@ export default function App() {
     const u2 = onSnapshot(collection(db, 'majelis'), (s) => setMajelisData(s.docs.map(d => ({ dbId: d.id, ...d.data() }))));
     const u3 = onSnapshot(collection(db, 'history'), (s) => setHistoryData(s.docs.map(d => ({ dbId: d.id, ...d.data() })).sort((a,b)=>b.timestamp - a.timestamp)));
     const u4 = onSnapshot(doc(db, 'settings', 'penatua_config'), (d) => { if(d.exists()) setPenatuaMap(d.data()); });
-    const u5 = onSnapshot(doc(db, 'settings', 'penatua_pass'), (d) => { if(d.exists()) setPenatuaPassMap(d.data()); }); // Fetch password dari database
+    const u5 = onSnapshot(doc(db, 'settings', 'penatua_pass'), (d) => { if(d.exists()) setPenatuaPassMap(d.data()); });
     return () => { u1(); u2(); u3(); u4(); u5(); };
   }, [firebaseUser]);
 
   const rayonList = useMemo(() => Object.keys(penatuaMap).sort((a,b)=>parseInt(a)-parseInt(b)), [penatuaMap]);
   const canEdit = (row) => appUser?.role === 'admin' || (appUser?.role === 'penatua' && (!row || String(row.noRayon) === Object.keys(penatuaMap).find(key => penatuaMap[key] === appUser.name)));
+
+  // Fungsi Cek Ketersediaan Nomor (Anti-Duplikat)
+  const getAvailableUrutanKk = () => {
+     if (!formData.noRayon) return Array.from({length:30},(_,i)=>i+1);
+     const used = jemaatData.filter(d => d.noRayon === formData.noRayon && d.statusKeluarga === 'Kepala Keluarga' && d.dbId !== formData.dbId).map(d => parseInt(d.urutanKk)).filter(n => !isNaN(n));
+     return Array.from({length:100},(_,i)=>i+1).filter(n => !used.includes(n));
+  };
+
+  const getAvailableNoAnggota = () => {
+     if (!formData.idKk) return Array.from({length:30},(_,i)=>i+1);
+     const used = jemaatData.filter(d => d.idKk === formData.idKk && d.dbId !== formData.dbId).map(d => parseInt(d.noAnggota)).filter(n => !isNaN(n));
+     return Array.from({length:30},(_,i)=>i+1).filter(n => !used.includes(n));
+  };
 
   const recordHistory = async (action, col, target) => {
     try { await addDoc(collection(db, 'history'), { action, collection: col, target: target || 'Data', user: appUser?.name || appUser?.role || 'System', timestamp: Date.now() }); } catch(e) {}
@@ -599,31 +609,24 @@ export default function App() {
            let v = (rows[i][idx] || '').replace(/^="|"$/g, '');
            if(h==='Jenis Kelamin'||h==='JK') { v = isL(v)?'Laki-laki':(isP(v)?'Perempuan':v); }
            
-           // --- PERBAIKAN PENDETEKSI TANGGAL ---
            const hLow = h.toLowerCase();
            if(hLow.includes('tgl') || hLow.includes('tanggal') || hLow.includes('lahir') || hLow.includes('baptis') || hLow.includes('sidi') || hLow.includes('nikah')) {
                let dateVal = v.replace(/\s+/g, '');
-               if (/^\d{4}-\d{2}-\d{2}$/.test(dateVal)) {
-                   v = dateVal;
-               } else if (dateVal.includes('/')) {
+               if (/^\d{4}-\d{2}-\d{2}$/.test(dateVal)) { v = dateVal; } 
+               else if (dateVal.includes('/')) {
                    const p = dateVal.split('/');
-                   if(p.length === 3) {
-                       if(p[2].length === 4) v = `${p[2]}-${pad0(p[1])}-${pad0(p[0])}`; // DD/MM/YYYY
-                       else if(p[0].length === 4) v = `${p[0]}-${pad0(p[1])}-${pad0(p[2])}`; // YYYY/MM/DD
-                   }
-               } else if (dateVal.includes('-')) {
+                   if(p.length === 3) { if(p[2].length === 4) v = `${p[2]}-${pad0(p[1])}-${pad0(p[0])}`; else if(p[0].length === 4) v = `${p[0]}-${pad0(p[1])}-${pad0(p[2])}`; }
+               } 
+               else if (dateVal.includes('-')) {
                    const p = dateVal.split('-');
-                   if(p.length === 3) {
-                       if(p[2].length === 4) v = `${p[2]}-${pad0(p[1])}-${pad0(p[0])}`; // DD-MM-YYYY
-                   }
+                   if(p.length === 3) { if(p[2].length === 4) v = `${p[2]}-${pad0(p[1])}-${pad0(p[0])}`; }
                }
            }
            
            if(isMajelis) {
                if(MAJELIS_HEADER_MAP[h]) { 
                    const safeKey = MAJELIS_HEADER_MAP[h].replace(/[~*/\[\]]/g, '');
-                   if(safeKey === 'statusMenikah') d[safeKey] = v.split(',').map(s=>s.trim()); 
-                   else d[safeKey] = v; 
+                   if(safeKey === 'statusMenikah') d[safeKey] = v.split(',').map(s=>s.trim()); else d[safeKey] = v; 
                } else {
                   const m = h.match(/(.+) Anak (\d)/);
                   if(m && (parseInt(m[2])-1)>=0 && (parseInt(m[2])-1)<6) {
@@ -747,6 +750,7 @@ export default function App() {
   const getTabHeaders = () => {
     const r = (v) => `R-${v}`; const bld = (v) => <span className="font-bold">{v}</span>; const lp = (v) => isL(v)?'L':(isP(v)?'P':'-');
     
+    // Pencabutan kolom ID Jemaat & ID KK dari layar (Tabel Bersih)
     if (activeTab === 'Data KK') return [
       {l:'Kepala Keluarga',k:'kepalaKeluarga', fmt:v=><span className="font-bold text-blue-700">{v}</span>},
       {l:'Nomor HP',k:'noHp'}, {l:'Bentuk Rumah',k:'bentukRumah'}, {l:'Status Rumah',k:'statusRumah', fmt:v=><span className="bg-gray-100 px-2 py-1 rounded text-xs font-semibold">{v}</span>},
@@ -758,12 +762,12 @@ export default function App() {
       {l:'L/P',k:'jk', fmt:lp}, {l:'Status Keluarga',k:'statusKeluarga', fmt:v=><span className="bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full text-xs font-bold">{v}</span>}, {l:'Pekerjaan',k:'pekerjaan'}
     ];
     if (activeTab === 'Status Jemaat') {
-      if (activeSubTabStatus === 'Data Kematian') return [{l:'ID Jemaat',k:'idJemaat'},{l:'Nama Lengkap',k:'namaLengkap', fmt:v=><span className="font-black text-gray-800">{v} <span className="text-red-500 text-xs italic">(Alm)</span></span>},{l:'L/P',k:'jk', fmt:lp},{l:'Tanggal Kematian',k:'tanggalKematian', fmt:toDisplayDate},{l:'Tanggal Penguburan',k:'tanggalPenguburan', fmt:toDisplayDate},{l:'Rayon',k:'noRayon', fmt:r}];
-      if (activeSubTabStatus === 'Pindah Jemaat') return [{l:'ID Jemaat',k:'idJemaat'},{l:'Nama Lengkap',k:'namaLengkap', fmt:v=><span className="font-black text-orange-700">{v} <span className="text-gray-500 text-xs italic">(Pindah)</span></span>},{l:'L/P',k:'jk', fmt:lp},{l:'Gereja Tujuan',k:'pindahKeJemaat'},{l:'Tanggal Pindah',k:'tanggalPindah', fmt:toDisplayDate},{l:'Rayon',k:'noRayon', fmt:r}];
-      if (activeSubTabStatus === 'Anggota Baptis') return [{l:'ID Jemaat',k:'idJemaat'},{l:'Nama Lengkap',k:'namaLengkap', fmt:v=><span className="font-bold text-teal-800">{v}</span>},{l:'L/P',k:'jk', fmt:lp},{l:'Tempat Lahir',k:'tempatLahir'},{l:'Tanggal Lahir',k:'tanggalLahir', fmt:toDisplayDate},{l:'Tanggal Baptis',k:'tanggalBaptis', fmt:toDisplayDate},{l:'Rayon',k:'noRayon', fmt:r}];
-      if (activeSubTabStatus === 'Anggota Sidi') return [{l:'ID Jemaat',k:'idJemaat'},{l:'Nama Lengkap',k:'namaLengkap', fmt:v=><span className="font-bold text-emerald-800">{v}</span>},{l:'L/P',k:'jk', fmt:lp},{l:'Tempat Lahir',k:'tempatLahir'},{l:'Tanggal Lahir',k:'tanggalLahir', fmt:toDisplayDate},{l:'Tanggal Sidi',k:'tanggalSidi', fmt:toDisplayDate},{l:'Rayon',k:'noRayon', fmt:r}];
-      if (activeSubTabStatus === 'Anggota Nikah') return [{l:'ID Jemaat',k:'idJemaat'},{l:'Nama Lengkap',k:'namaLengkap', fmt:v=><span className="font-bold text-purple-800">{v}</span>},{l:'L/P',k:'jk', fmt:lp},{l:'Tanggal Lahir',k:'tanggalLahir', fmt:toDisplayDate},{l:'Tanggal Nikah',k:'tanggalNikah', fmt:toDisplayDate},{l:'Status Nikah',k:'jenisNikah', fmt:v=>Array.isArray(v)?v.join(', '):v},{l:'Rayon',k:'noRayon', fmt:r}];
-      if (activeSubTabStatus === 'Ulang Tahun' || activeSubTabStatus === 'Pelayanan Kategori') return [{l:'ID Jemaat',k:'idJemaat'},{l:'Nama Lengkap',k:'namaLengkap', fmt: activeSubTabStatus === 'Ulang Tahun' ? v=><span className="font-black text-pink-700 flex items-center gap-2">{v} <Gift className="w-4 h-4 inline"/></span> : bld},{l:'L/P',k:'jk', fmt:lp},{l:'Tanggal Lahir',k:'tanggalLahir', fmt:toDisplayDate},{l:'Usia',k:'tanggalLahir', fmt:v=><span className="font-black text-teal-700 text-lg">{calculateAge(v)}</span>},{l:'Rayon',k:'noRayon', fmt:r}];
+      if (activeSubTabStatus === 'Data Kematian') return [{l:'Nama Lengkap',k:'namaLengkap', fmt:v=><span className="font-black text-gray-800">{v} <span className="text-red-500 text-xs italic">(Alm)</span></span>},{l:'L/P',k:'jk', fmt:lp},{l:'Tanggal Kematian',k:'tanggalKematian', fmt:toDisplayDate},{l:'Tanggal Penguburan',k:'tanggalPenguburan', fmt:toDisplayDate},{l:'Rayon',k:'noRayon', fmt:r}];
+      if (activeSubTabStatus === 'Pindah Jemaat') return [{l:'Nama Lengkap',k:'namaLengkap', fmt:v=><span className="font-black text-orange-700">{v} <span className="text-gray-500 text-xs italic">(Pindah)</span></span>},{l:'L/P',k:'jk', fmt:lp},{l:'Gereja Tujuan',k:'pindahKeJemaat'},{l:'Tanggal Pindah',k:'tanggalPindah', fmt:toDisplayDate},{l:'Rayon',k:'noRayon', fmt:r}];
+      if (activeSubTabStatus === 'Anggota Baptis') return [{l:'Nama Lengkap',k:'namaLengkap', fmt:v=><span className="font-bold text-teal-800">{v}</span>},{l:'L/P',k:'jk', fmt:lp},{l:'Tempat Lahir',k:'tempatLahir'},{l:'Tanggal Lahir',k:'tanggalLahir', fmt:toDisplayDate},{l:'Tanggal Baptis',k:'tanggalBaptis', fmt:toDisplayDate},{l:'Rayon',k:'noRayon', fmt:r}];
+      if (activeSubTabStatus === 'Anggota Sidi') return [{l:'Nama Lengkap',k:'namaLengkap', fmt:v=><span className="font-bold text-emerald-800">{v}</span>},{l:'L/P',k:'jk', fmt:lp},{l:'Tempat Lahir',k:'tempatLahir'},{l:'Tanggal Lahir',k:'tanggalLahir', fmt:toDisplayDate},{l:'Tanggal Sidi',k:'tanggalSidi', fmt:toDisplayDate},{l:'Rayon',k:'noRayon', fmt:r}];
+      if (activeSubTabStatus === 'Anggota Nikah') return [{l:'Nama Lengkap',k:'namaLengkap', fmt:v=><span className="font-bold text-purple-800">{v}</span>},{l:'L/P',k:'jk', fmt:lp},{l:'Tanggal Lahir',k:'tanggalLahir', fmt:toDisplayDate},{l:'Tanggal Nikah',k:'tanggalNikah', fmt:toDisplayDate},{l:'Status Nikah',k:'jenisNikah', fmt:v=>Array.isArray(v)?v.join(', '):v},{l:'Rayon',k:'noRayon', fmt:r}];
+      if (activeSubTabStatus === 'Ulang Tahun' || activeSubTabStatus === 'Pelayanan Kategori') return [{l:'Nama Lengkap',k:'namaLengkap', fmt: activeSubTabStatus === 'Ulang Tahun' ? v=><span className="font-black text-pink-700 flex items-center gap-2">{v} <Gift className="w-4 h-4 inline"/></span> : bld},{l:'L/P',k:'jk', fmt:lp},{l:'Tanggal Lahir',k:'tanggalLahir', fmt:toDisplayDate},{l:'Usia',k:'tanggalLahir', fmt:v=><span className="font-black text-teal-700 text-lg">{calculateAge(v)}</span>},{l:'Rayon',k:'noRayon', fmt:r}];
     }
     if (activeTab === 'Profil Majelis') return [
       {l:'Foto', k:'fotoBase64', fmt:v=>v?<img src={v} className="w-10 h-10 rounded-full object-cover shadow border border-gray-200" alt="foto"/>:<span className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full text-xs text-gray-400 border border-gray-200">?</span>},
@@ -878,7 +882,7 @@ export default function App() {
                     <h4 className="font-bold text-blue-800 mb-4 border-b border-blue-200 pb-2"><Home className="w-5 h-5 inline mr-2"/> Data Kepala Keluarga</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormInput req label="Nomor Rayon" name="noRayon" type="select" opts={rayonList} value={formData.noRayon} onChange={handleFormChange} />
-                      <FormInput req label="Urutan KK Ke-" name="urutanKk" type="select" opts={Array.from({length:30},(_,i)=>i+1)} value={formData.urutanKk} onChange={handleFormChange} />
+                      <FormInput req label="Urutan KK Ke-" name="urutanKk" type="select" opts={getAvailableUrutanKk()} value={formData.urutanKk} onChange={handleFormChange} />
                       <FormInput req label="ID KK (Otomatis)" name="idKk" value={formData.idKk} dis span={2} />
                       <FormInput req label="Nama Kepala Keluarga" name="kepalaKeluarga" value={formData.kepalaKeluarga} onChange={handleFormChange} />
                       <FormInput label="Nomor HP" name="noHp" value={formData.noHp} onChange={handleFormChange} />
@@ -903,18 +907,25 @@ export default function App() {
                               if(kk) setFormData(p => ({...p, idKk: kk.idKk, kepalaKeluarga: kk.kepalaKeluarga, noHp: kk.noHp, bentukRumah: kk.bentukRumah, statusRumah: kk.statusRumah, noRayon: kk.noRayon, urutanKk: kk.urutanKk, penatua: kk.penatua, alamat: kk.alamat, noAnggota: '', idJemaat: '' }));
                             }} className="w-full border-2 border-blue-300 p-2.5 rounded-lg bg-white outline-none" >
                             <option value="">-- Pilih KK --</option>
-                            {jemaatData.filter(d=>d.statusKeluarga==='Kepala Keluarga').map((k,idx) => <option key={idx} value={k.idKk}>{k.idKk} - {k.kepalaKeluarga}</option>)}
+                            {jemaatData
+                              .filter(d=>d.statusKeluarga==='Kepala Keluarga' && (!formData.noRayon || d.noRayon === formData.noRayon))
+                              .sort((a,b) => parseInt(a.urutanKk) - parseInt(b.urutanKk))
+                              .map((k,idx) => <option key={idx} value={k.idKk}>{k.idKk} - {k.kepalaKeluarga}</option>)}
                           </select>
                         </div>
                       )}
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <FormInput label="ID KK" value={formData.idKk} dis />
-                        <FormInput label="Kepala Keluarga" value={formData.kepalaKeluarga} dis />
+                        <FormInput label="Kepala Keluarga" name="kepalaKeluarga" value={formData.kepalaKeluarga} onChange={handleFormChange} />
                         <FormInput label="Rayon" value={formData.noRayon} dis />
                       </div>
                     </div>
                     <h4 className="md:col-span-2 font-bold text-gray-800 border-b pb-2 mt-2 text-lg">Data Pribadi</h4>
-                    {JEMAAT_FIELDS_PRIBADI.map(f => <FormInput key={f.name} {...f} value={formData[f.name]} onChange={handleFormChange} />)}
+                    {JEMAAT_FIELDS_PRIBADI.map(f => {
+                       let options = f.opts;
+                       if (f.name === 'noAnggota') options = getAvailableNoAnggota();
+                       return <FormInput key={f.name} {...f} opts={options} value={formData[f.name]} onChange={handleFormChange} />;
+                    })}
                     <h4 className="md:col-span-2 font-bold text-gray-800 border-b pb-2 mt-4 text-lg">Agama & Pendidikan</h4>
                     <div className="md:col-span-2 grid grid-cols-4 gap-3 bg-gray-50 p-3 rounded border">
                       <FormInput label="Sudah Baptis?" name="baptis" type="select" opts={['Ya','Belum']} value={formData.baptis} onChange={handleFormChange} />
@@ -933,16 +944,17 @@ export default function App() {
                       <FormInput label="Gereja Nikah" name="gerejaNikah" dis={formData.nikah!=='Ya'} value={formData.gerejaNikah} onChange={handleFormChange} />
                       <FormInput label="Tgl Nikah" name="tanggalNikah" type="date" dis={formData.nikah!=='Ya'} value={formData.tanggalNikah} onChange={handleFormChange} />
                       <FormInput label="Pendeta Nikah" name="pendetaNikah" dis={formData.nikah!=='Ya'} value={formData.pendetaNikah} onChange={handleFormChange} />
-                      
-                      {/* PENAMBAHAN OPSI LUAR NIKAH PADA CHECKBOX */}
                       <FormInput label="Jenis Nikah" name="jenisNikah" isCheckboxGroup opts={['Nikah Adat', 'Nikah Gereja/Masehi', 'Nikah Catatan Sipil/BS', 'Luar Nikah']} dis={formData.nikah!=='Ya'} value={formData.jenisNikah} onCheckboxChange={handleCheckboxChange} span={4} />
                     </div>
                     {JEMAAT_EDU.map(f => <FormInput key={f.name} {...f} value={formData[f.name]} onChange={handleFormChange} />)}
                     <h4 className="md:col-span-2 font-bold text-gray-800 border-b pb-2 mt-4 text-lg">Kesehatan & Status Sosial</h4>
                     <FormInput label="Asuransi Kesehatan" name="asuransi" type="select" opts={['Ya','Tidak']} value={formData.asuransi} onChange={handleFormChange} />
                     <FormInput label="Jaminan" name="jaminan" type="select" opts={['BPJS/Askes','Asuransi Kesehatan lainnya']} dis={formData.asuransi!=='Ya'} value={formData.jaminan} onChange={handleFormChange} />
-                    <FormInput label="Janda/Duda" name="jandaDuda" type="select" opts={['Janda','Duda']} value={formData.jandaDuda} onChange={handleFormChange} />
-                    <FormInput label="Yatim Piatu" name="yatimPiatu" type="select" opts={['Yatim','Piatu','Yatim Piatu']} value={formData.yatimPiatu} onChange={handleFormChange} />
+                    
+                    {/* Tambahan Opsi 'Tidak' Pada Janda/Duda & Yatim Piatu */}
+                    <FormInput label="Janda/Duda" name="jandaDuda" type="select" opts={['Tidak', 'Janda', 'Duda']} value={formData.jandaDuda} onChange={handleFormChange} />
+                    <FormInput label="Yatim Piatu" name="yatimPiatu" type="select" opts={['Tidak', 'Yatim', 'Piatu', 'Yatim Piatu']} value={formData.yatimPiatu} onChange={handleFormChange} />
+                    
                     <FormInput label="Disabilitas" name="disabilitas" type="select" opts={['Ya','Tidak']} value={formData.disabilitas} onChange={handleFormChange} />
                     <FormInput label="Jenis Disabilitas" name="jenisDisabilitas" type="select" opts={['Tuna Netra', 'Tuna Rungu', 'Tuna Wicara', 'Tuna Daksa', 'Tuna Laras', 'Tuna Grahita']} dis={formData.disabilitas!=='Ya'} value={formData.jenisDisabilitas} onChange={handleFormChange} />
                     <FormInput label="Jabatan dalam Jemaat" name="jabatanJemaat" value={formData.jabatanJemaat} onChange={handleFormChange} />
@@ -1073,7 +1085,7 @@ export default function App() {
       <div className={printMode !== null ? 'hidden' : 'block'}>
         <header className="fixed top-4 left-4 right-4 bg-white/95 backdrop-blur-md rounded-3xl shadow-sm z-40 px-6 py-4 border border-gray-200 flex items-center justify-between print:hidden">
           <div className="flex items-center gap-4">
-            <img src="https://imgur.com/XV3hpOH.png" alt="Logo" className="w-12 h-12 object-contain bg-white rounded-full p-1 shadow-sm border border-gray-100" />
+            <img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-12 h-12 object-contain bg-white rounded-full p-1 shadow-sm border border-gray-100" />
             <div>
               <h1 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Sistem Data Terpadu</h1>
               <div className="text-xs text-blue-600 font-bold hidden md:flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div> DB Terkoneksi • Akses: <span className="uppercase">{appUser?.role}</span></div>
@@ -1265,7 +1277,12 @@ export default function App() {
                                             ) : isEditable ? (
                                               <>
                                                 <button onClick={() => { setFormData(row); setModalMode(activeTab === 'Data KK' ? 'editKk' : activeTab === 'Profil Majelis' ? 'editMajelis' : 'editJemaat'); }} className="p-2 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg transition" title="Edit Data"><Edit className="w-4 h-4" /></button>
-                                                <button onClick={() => requestDelete(activeTab === 'Profil Majelis' ? 'majelis' : 'jemaat', row.dbId, row.namaLengkap||row.kepalaKeluarga)} className="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg transition" title="Hapus Data"><Trash2 className="w-4 h-4" /></button>
+                                                
+                                                {/* Hanya Admin yang bisa melihat tombol Hapus */}
+                                                {appUser?.role === 'admin' && (
+                                                  <button onClick={() => requestDelete(activeTab === 'Profil Majelis' ? 'majelis' : 'jemaat', row.dbId, row.namaLengkap||row.kepalaKeluarga)} className="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg transition" title="Hapus Data"><Trash2 className="w-4 h-4" /></button>
+                                                )}
+
                                                 {activeTab === 'Data KK' && (
                                                   <>
                                                     <button onClick={() => { setFormData({ idKk: row.idKk, kepalaKeluarga: row.kepalaKeluarga, noHp: row.noHp, bentukRumah: row.bentukRumah, statusRumah: row.statusRumah, noRayon: row.noRayon, urutanKk: row.urutanKk, penatua: row.penatua, alamat: row.alamat, noAnggota: '', idJemaat: `AG${pad0(row.noRayon)}${pad0(row.urutanKk)}`, namaLengkap: '', jk: '', statusKeluarga: 'Anak kandung' }); setModalMode('addAnggota'); }} className="p-2 ml-1 bg-green-100 text-green-700 hover:bg-green-600 hover:text-white rounded-lg font-black text-xs flex items-center transition"><Plus className="w-4 h-4"/></button>
