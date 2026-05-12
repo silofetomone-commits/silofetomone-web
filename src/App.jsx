@@ -50,7 +50,7 @@ const FORM_MAJELIS = [
 ];
 
 const JEMAAT_FIELDS_PRIBADI = [
-  { name: 'noAnggota', label: 'No Anggota Keluarga Ke-', type: 'select', req: true, opts: [] }, // Opts dinamis
+  { name: 'noAnggota', label: 'No Anggota Keluarga Ke-', type: 'select', req: true, opts: [] }, // Opts di-inject dinamis
   { name: 'namaLengkap', label: 'Nama Lengkap', req: true }, { name: 'nik', label: 'NIK' }, { name: 'jk', label: 'Jenis Kelamin', type: 'select', opts: ['Laki-laki', 'Perempuan'] },
   { name: 'goldar', label: 'Golongan Darah', type: 'select', opts: ['A', 'B', 'AB', 'O', 'Tidak Tahu'] }, { name: 'tempatLahir', label: 'Tempat Lahir' }, { name: 'tanggalLahir', label: 'Tanggal Lahir', type: 'date' },
   { name: 'alamat', label: 'Alamat Domisili Lengkap', span: 2 }, { name: 'sukuAyah', label: 'Suku Ayah' }, { name: 'sukuIbu', label: 'Suku Ibu' },
@@ -517,18 +517,19 @@ export default function App() {
   const rayonList = useMemo(() => Object.keys(penatuaMap).sort((a,b)=>parseInt(a)-parseInt(b)), [penatuaMap]);
   const canEdit = (row) => appUser?.role === 'admin' || (appUser?.role === 'penatua' && (!row || String(row.noRayon) === Object.keys(penatuaMap).find(key => penatuaMap[key] === appUser.name)));
 
-  // Fungsi Cek Ketersediaan Nomor (Anti-Duplikat)
-  const getAvailableUrutanKk = () => {
-     if (!formData.noRayon) return Array.from({length:30},(_,i)=>i+1);
-     const used = jemaatData.filter(d => d.noRayon === formData.noRayon && d.statusKeluarga === 'Kepala Keluarga' && d.dbId !== formData.dbId).map(d => parseInt(d.urutanKk)).filter(n => !isNaN(n));
-     return Array.from({length:100},(_,i)=>i+1).filter(n => !used.includes(n));
-  };
+  // FITUR 1: useMemo untuk Opsi Urutan KK Anti-Duplikat
+  const urutanKkOpts = useMemo(() => {
+    if (!formData.noRayon) return Array.from({length:30},(_,i)=>i+1);
+    const used = jemaatData.filter(d => d.noRayon === formData.noRayon && d.statusKeluarga === 'Kepala Keluarga' && d.dbId !== formData.dbId).map(d => parseInt(d.urutanKk)).filter(n => !isNaN(n));
+    return Array.from({length:100},(_,i)=>i+1).filter(n => !used.includes(n));
+  }, [formData.noRayon, formData.dbId, jemaatData]);
 
-  const getAvailableNoAnggota = () => {
-     if (!formData.idKk) return Array.from({length:30},(_,i)=>i+1);
-     const used = jemaatData.filter(d => d.idKk === formData.idKk && d.dbId !== formData.dbId).map(d => parseInt(d.noAnggota)).filter(n => !isNaN(n));
-     return Array.from({length:30},(_,i)=>i+1).filter(n => !used.includes(n));
-  };
+  // FITUR 1: useMemo untuk Opsi No Anggota Anti-Duplikat
+  const noAnggotaOpts = useMemo(() => {
+    if (!formData.idKk) return Array.from({length:30},(_,i)=>i+1);
+    const used = jemaatData.filter(d => d.idKk === formData.idKk && d.dbId !== formData.dbId).map(d => parseInt(d.noAnggota)).filter(n => !isNaN(n));
+    return Array.from({length:30},(_,i)=>i+1).filter(n => !used.includes(n));
+  }, [formData.idKk, formData.dbId, jemaatData]);
 
   const recordHistory = async (action, col, target) => {
     try { await addDoc(collection(db, 'history'), { action, collection: col, target: target || 'Data', user: appUser?.name || appUser?.role || 'System', timestamp: Date.now() }); } catch(e) {}
@@ -704,12 +705,37 @@ export default function App() {
     });
   };
 
+  // FITUR 3: MAGIC LOGIC (Pindah Rayon Sekeluarga)
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     const dataToSave = { ...formData }; const docId = dataToSave.dbId; delete dataToSave.dbId;
 
     if (modalMode === 'addKk' || modalMode === 'editKk') {
-      dataToSave.namaLengkap = dataToSave.kepalaKeluarga; dataToSave.statusKeluarga = 'Kepala Keluarga';
+      dataToSave.namaLengkap = dataToSave.kepalaKeluarga;
+      dataToSave.statusKeluarga = 'Kepala Keluarga';
+      
+      // Jika mode Edit KK, terapkan kecerdasan otomatis pembaruan sekeluarga
+      if (modalMode === 'editKk') {
+          const originalKkData = jemaatData.find(d => d.dbId === docId);
+          const oldIdKk = originalKkData?.idKk;
+          const newIdKk = dataToSave.idKk;
+          
+          if (oldIdKk && newIdKk && oldIdKk !== newIdKk) {
+              // Cari seluruh anggota keluarga (istri, anak, dll) dengan ID KK yang lama
+              const familyMembers = jemaatData.filter(d => d.idKk === oldIdKk && d.dbId !== docId);
+              for (const member of familyMembers) {
+                  const newMemberIdJemaat = `AG${pad0(dataToSave.noRayon)}${pad0(dataToSave.urutanKk)}${pad0(member.noAnggota)}`;
+                  await updateDoc(doc(db, 'jemaat', member.dbId), {
+                      idKk: newIdKk,
+                      noRayon: dataToSave.noRayon,
+                      penatua: dataToSave.penatua,
+                      alamat: dataToSave.alamat,
+                      idJemaat: newMemberIdJemaat
+                  });
+              }
+          }
+      }
+
       if(modalMode === 'addKk') { dataToSave.statusHidup = 'Hidup'; dataToSave.statusKeanggotaan = 'Aktif'; }
       await saveDocument('jemaat', dataToSave, docId);
     } 
@@ -750,7 +776,7 @@ export default function App() {
   const getTabHeaders = () => {
     const r = (v) => `R-${v}`; const bld = (v) => <span className="font-bold">{v}</span>; const lp = (v) => isL(v)?'L':(isP(v)?'P':'-');
     
-    // Pencabutan kolom ID Jemaat & ID KK dari layar (Tabel Bersih)
+    // FITUR 7: Tabel Bersih (Kolom ID KK & ID Jemaat dicabut dari tampilan)
     if (activeTab === 'Data KK') return [
       {l:'Kepala Keluarga',k:'kepalaKeluarga', fmt:v=><span className="font-bold text-blue-700">{v}</span>},
       {l:'Nomor HP',k:'noHp'}, {l:'Bentuk Rumah',k:'bentukRumah'}, {l:'Status Rumah',k:'statusRumah', fmt:v=><span className="bg-gray-100 px-2 py-1 rounded text-xs font-semibold">{v}</span>},
@@ -882,7 +908,7 @@ export default function App() {
                     <h4 className="font-bold text-blue-800 mb-4 border-b border-blue-200 pb-2"><Home className="w-5 h-5 inline mr-2"/> Data Kepala Keluarga</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormInput req label="Nomor Rayon" name="noRayon" type="select" opts={rayonList} value={formData.noRayon} onChange={handleFormChange} />
-                      <FormInput req label="Urutan KK Ke-" name="urutanKk" type="select" opts={getAvailableUrutanKk()} value={formData.urutanKk} onChange={handleFormChange} />
+                      <FormInput req label="Urutan KK Ke-" name="urutanKk" type="select" opts={urutanKkOpts} value={formData.urutanKk} onChange={handleFormChange} />
                       <FormInput req label="ID KK (Otomatis)" name="idKk" value={formData.idKk} dis span={2} />
                       <FormInput req label="Nama Kepala Keluarga" name="kepalaKeluarga" value={formData.kepalaKeluarga} onChange={handleFormChange} />
                       <FormInput label="Nomor HP" name="noHp" value={formData.noHp} onChange={handleFormChange} />
@@ -899,16 +925,35 @@ export default function App() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-2">
                     <div className="md:col-span-2 bg-gray-100 p-5 rounded-xl border border-gray-200">
                       <h4 className="font-bold text-gray-800 mb-3 border-b pb-2"><Lock className="w-4 h-4 inline mr-2"/> Data KK (Terkunci)</h4>
-                      {modalMode === 'addJemaat' && (
+                      
+                      {/* FITUR 2: Buka Kunci Kepala Keluarga & Filter Rayon Khusus Form Jemaat */}
+                      {(modalMode === 'addJemaat' || modalMode === 'editJemaat') && (appUser?.role === 'admin' || appUser?.role === 'penatua') && (
                         <div className="mb-5 bg-blue-50 p-4 rounded-lg border border-blue-200">
+                          <label className="text-sm font-bold text-blue-900 block mb-1">Saring Berdasarkan Rayon Terlebih Dahulu</label>
+                          <select value={formData.filterRayonModal || ''} onChange={(e) => setFormData(p => ({...p, filterRayonModal: e.target.value, idKk: ''}))} className="w-full border-2 border-blue-300 p-2.5 rounded-lg bg-white outline-none mb-3" >
+                             <option value="">-- Semua Rayon --</option>
+                             {rayonList.map(r => <option key={r} value={r}>Rayon {r}</option>)}
+                          </select>
+
                           <label className="text-sm font-bold text-blue-900 block mb-1">Pilih Kepala Keluarga</label>
                           <select value={formData.idKk || ''} onChange={(e) => {
                               const kk = jemaatData.find(k => k.idKk === e.target.value && k.statusKeluarga === 'Kepala Keluarga');
-                              if(kk) setFormData(p => ({...p, idKk: kk.idKk, kepalaKeluarga: kk.kepalaKeluarga, noHp: kk.noHp, bentukRumah: kk.bentukRumah, statusRumah: kk.statusRumah, noRayon: kk.noRayon, urutanKk: kk.urutanKk, penatua: kk.penatua, alamat: kk.alamat, noAnggota: '', idJemaat: '' }));
+                              if(kk) {
+                                setFormData(p => ({
+                                  ...p,
+                                  idKk: kk.idKk,
+                                  kepalaKeluarga: kk.kepalaKeluarga,
+                                  noRayon: kk.noRayon,
+                                  urutanKk: kk.urutanKk,
+                                  penatua: kk.penatua,
+                                  alamat: kk.alamat,
+                                  idJemaat: p.noAnggota ? `AG${pad0(kk.noRayon)}${pad0(kk.urutanKk)}${pad0(p.noAnggota)}` : ''
+                                }));
+                              }
                             }} className="w-full border-2 border-blue-300 p-2.5 rounded-lg bg-white outline-none" >
                             <option value="">-- Pilih KK --</option>
                             {jemaatData
-                              .filter(d=>d.statusKeluarga==='Kepala Keluarga' && (!formData.noRayon || d.noRayon === formData.noRayon))
+                              .filter(d=>d.statusKeluarga==='Kepala Keluarga' && (!formData.filterRayonModal || d.noRayon === formData.filterRayonModal))
                               .sort((a,b) => parseInt(a.urutanKk) - parseInt(b.urutanKk))
                               .map((k,idx) => <option key={idx} value={k.idKk}>{k.idKk} - {k.kepalaKeluarga}</option>)}
                           </select>
@@ -916,14 +961,14 @@ export default function App() {
                       )}
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <FormInput label="ID KK" value={formData.idKk} dis />
-                        <FormInput label="Kepala Keluarga" name="kepalaKeluarga" value={formData.kepalaKeluarga} onChange={handleFormChange} />
+                        <FormInput label="Kepala Keluarga" name="kepalaKeluarga" value={formData.kepalaKeluarga} dis />
                         <FormInput label="Rayon" value={formData.noRayon} dis />
                       </div>
                     </div>
                     <h4 className="md:col-span-2 font-bold text-gray-800 border-b pb-2 mt-2 text-lg">Data Pribadi</h4>
                     {JEMAAT_FIELDS_PRIBADI.map(f => {
                        let options = f.opts;
-                       if (f.name === 'noAnggota') options = getAvailableNoAnggota();
+                       if (f.name === 'noAnggota') options = noAnggotaOpts; // Gunakan hooks anti-duplikat
                        return <FormInput key={f.name} {...f} opts={options} value={formData[f.name]} onChange={handleFormChange} />;
                     })}
                     <h4 className="md:col-span-2 font-bold text-gray-800 border-b pb-2 mt-4 text-lg">Agama & Pendidikan</h4>
@@ -951,7 +996,6 @@ export default function App() {
                     <FormInput label="Asuransi Kesehatan" name="asuransi" type="select" opts={['Ya','Tidak']} value={formData.asuransi} onChange={handleFormChange} />
                     <FormInput label="Jaminan" name="jaminan" type="select" opts={['BPJS/Askes','Asuransi Kesehatan lainnya']} dis={formData.asuransi!=='Ya'} value={formData.jaminan} onChange={handleFormChange} />
                     
-                    {/* Tambahan Opsi 'Tidak' Pada Janda/Duda & Yatim Piatu */}
                     <FormInput label="Janda/Duda" name="jandaDuda" type="select" opts={['Tidak', 'Janda', 'Duda']} value={formData.jandaDuda} onChange={handleFormChange} />
                     <FormInput label="Yatim Piatu" name="yatimPiatu" type="select" opts={['Tidak', 'Yatim', 'Piatu', 'Yatim Piatu']} value={formData.yatimPiatu} onChange={handleFormChange} />
                     
