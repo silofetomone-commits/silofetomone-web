@@ -68,7 +68,6 @@ const safeStr = v => (v === null || v === undefined) ? '-' : Array.isArray(v) ? 
 const isL = jk => String(jk||'').toLowerCase().startsWith('l');
 const isP = jk => String(jk||'').toLowerCase().startsWith('p');
 
-// FIX PARSE ERROR: Gunakan template literal (backticks) dengan benar
 const toInputDate = d => (d && typeof d==='string' && d.includes('/')) ? `${d.split('/')[2]}-${pad0(d.split('/')[1])}-${pad0(d.split('/')[0])}` : (d||'');
 const toDisplayDate = d => (d && typeof d==='string' && d.includes('-')) ? `${d.split('-')[2]}-${d.split('-')[1]}-${d.split('-')[0]}` : (d||'-');
 
@@ -249,7 +248,7 @@ function PrintKkTemplate({ kkToPrint, jemaatData, penatuaMap, onBack }) {
 
   return (
     <div className="w-full bg-white text-black p-4 text-[11px] font-sans">
-       <style type="text/css">{"@page { size: landscape; margin: 10mm; }"}</style>
+       <style type="text/css">{`@page { size: landscape; margin: 10mm; }`}</style>
        <div className="flex justify-between items-center mb-4 border-b-2 border-black pb-2">
           <div><h1 className="text-xl font-bold uppercase tracking-wider">GEREJA MASEHI INJILI DI TIMOR (GMIT)</h1><h2 className="text-lg font-bold uppercase">DATA JEMAAT GMIT - SILOFETOMONE</h2></div>
           <div className="text-right"><img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-16 h-16 object-contain" /></div>
@@ -321,7 +320,7 @@ function PrintMajelisTemplate({ majelisToPrint, majelisData, penatuaMap, onBack 
   
   return (
     <div className="w-full bg-white text-black p-8 text-sm font-sans max-w-4xl mx-auto border shadow-lg print:border-none print:shadow-none print:m-0 print:p-0">
-       <style type="text/css">{"@page { size: portrait; margin: 15mm; }"}</style>
+       <style type="text/css">{`@page { size: portrait; margin: 15mm; }`}</style>
        <div className="text-center mb-6 border-b-4 border-double border-black pb-4"><img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-20 h-20 mx-auto mb-2" /><h1 className="text-2xl font-black uppercase">PROFIL PELAYAN / MAJELIS JEMAAT</h1><h2 className="text-lg font-bold uppercase">SILOFETOMONE - RAYON {safeStr(mj.noRayon)}</h2></div>
        <div className="flex gap-8 mb-6">
           <div className="w-1/4">
@@ -394,7 +393,7 @@ function PrintListTemplate({ listToPrint, tabCols, filteredData, filterRayon, fi
 
   return (
     <div className="block w-full bg-white text-black p-8 text-sm font-sans max-w-5xl mx-auto border shadow-lg print:border-none print:shadow-none print:m-0 print:p-0">
-       <style type="text/css">{"@page { size: landscape; margin: 15mm; }"}</style>
+       <style type="text/css">{`@page { size: landscape; margin: 15mm; }`}</style>
        <div className="text-center mb-6 border-b-4 border-double border-black pb-4">
           <img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-20 h-20 mx-auto mb-2" />
           <h1 className="text-2xl font-black uppercase">LAPORAN DATA {safeStr(listToPrint).toUpperCase()}</h1>
@@ -523,15 +522,15 @@ export default function App() {
   // FITUR 1: PERBAIKAN ANTI CRASH (Optional Chaining & Fallback) untuk Urutan KK
   const urutanKkOpts = useMemo(() => {
     if (!formData?.noRayon) return Array.from({length:30},(_,i)=>i+1);
-    const used = (jemaatData || []).filter(d => d.noRayon === formData.noRayon && d.statusKeluarga === 'Kepala Keluarga' && d.dbId !== formData?.dbId).map(d => parseInt(d.urutanKk)).filter(n => !isNaN(n));
-    return Array.from({length:100},(_,i)=>i+1).filter(n => !used.includes(n));
+    const usedUrutanKkNum = (jemaatData || []).filter(d => d.noRayon === formData.noRayon && d.statusKeluarga === 'Kepala Keluarga' && d.dbId !== formData?.dbId).map(d => parseInt(d.urutanKk)).filter(n => !isNaN(n));
+    return Array.from({length:100},(_,i)=>i+1).filter(n => !usedUrutanKkNum.includes(n));
   }, [formData?.noRayon, formData?.dbId, jemaatData]);
 
   // FITUR 1: PERBAIKAN ANTI CRASH (Optional Chaining & Fallback) untuk No Anggota
   const noAnggotaOpts = useMemo(() => {
     if (!formData?.idKk) return Array.from({length:30},(_,i)=>i+1);
-    const used = (jemaatData || []).filter(d => d.idKk === formData.idKk && d.dbId !== formData?.dbId).map(d => parseInt(d.noAnggota)).filter(n => !isNaN(n));
-    return Array.from({length:30},(_,i)=>i+1).filter(n => !used.includes(n));
+    const usedNoAnggotaNum = (jemaatData || []).filter(d => d.idKk === formData.idKk && d.dbId !== formData?.dbId).map(d => parseInt(d.noAnggota)).filter(n => !isNaN(n));
+    return Array.from({length:30},(_,i)=>i+1).filter(n => !usedNoAnggotaNum.includes(n));
   }, [formData?.idKk, formData?.dbId, jemaatData]);
 
   const recordHistory = async (action, col, target) => {
@@ -590,6 +589,51 @@ export default function App() {
     
     t += `</table></body></html>`;
     const blob = new Blob([t], { type: "application/vnd.ms-excel" }); const l = document.createElement("a"); l.href = URL.createObjectURL(blob); l.download = `Data_${typeName}_SILOFETOMONE.xls`; document.body.appendChild(l); l.click(); document.body.removeChild(l);
+  };
+
+  // FITUR BARU: Fungsi Khusus Export Laporan Format Sinode (Pisah Tanggal Lahir dan Format Biner Pernikahan)
+  const handleExportSinode = () => {
+    let t = `<html xmlns:x="urn:schemas-microsoft-com:office:excel"><body><table border="1">`;
+    const sinodeHeaders = [
+      "Rayon", "Alamat", "No.Telp", "Nama Kepala Keluarga", "Nama Lengkap", "NIK", "Jenis Kelamin",
+      "Tempat Lahir", "Tanggal lahir", "Bulan Lahir", "Tahun lahir", "Golongan Darah", "Status dalam Keluarga",
+      "Baptis", "Sidi", "Nikah", "Status nikah", "Status nikah/Nikah Adat", "Status nikah/Nikah Gereja/Masehi",
+      "Status nikah/Nikah Catatan Sipil/BS", "Suku Ayah", "Suku Ibu", "Pendidikan", "Pekerjaan utama", "Penghasilan",
+      "Apakah mempunyai jaminan/asuransi kesehatan?", "Jaminan Kesehatan", "Jika asuransi lainnya, sebutkan!",
+      "Janda / Duda", "Yatim / Piatu", "Disabilitas", "Jika ya, sebutkan ragam disabilitas", "_index", "_parent_index", "Usia"
+    ];
+    t += `<tr>${sinodeHeaders.map(h => `<th style="background-color:#0284c7;color:white;">${h}</th>`).join('')}</tr>`;
+
+    [...jemaatData].sort((a,b) => (a.noRayon||'').localeCompare(b.noRayon||'') || (a.idKk||'').localeCompare(b.idKk||'')).forEach(d => {
+      let hari = '', bulan = '', tahun = '';
+      if (d.tanggalLahir) {
+          const p = d.tanggalLahir.split('-');
+          if (p.length === 3) {
+              tahun = p[0];
+              bulan = NAMA_BULAN[parseInt(p[1], 10) - 1] || '';
+              hari = parseInt(p[2], 10).toString();
+          }
+      }
+      
+      const isAdat = Array.isArray(d.jenisNikah) && d.jenisNikah.includes('Nikah Adat') ? '1' : '0';
+      const isGereja = Array.isArray(d.jenisNikah) && d.jenisNikah.includes('Nikah Gereja/Masehi') ? '1' : '0';
+      const isSipil = Array.isArray(d.jenisNikah) && d.jenisNikah.includes('Nikah Catatan Sipil/BS') ? '1' : '0';
+      const statusNikahStr = Array.isArray(d.jenisNikah) ? d.jenisNikah.join(', ') : (d.jenisNikah || '');
+      
+      const row = [
+          `Rayon ${d.noRayon || ''}`, d.alamat, d.noHp || '0', d.kepalaKeluarga, d.namaLengkap, `="${d.nik||''}"`, d.jk,
+          d.tempatLahir, hari, bulan, tahun, d.goldar, d.statusKeluarga, d.baptis, d.sidi, d.nikah, statusNikahStr,
+          isAdat, isGereja, isSipil, d.sukuAyah, d.sukuIbu, d.pendidikan, d.pekerjaan, d.penghasilan,
+          d.asuransi, d.jaminan, '', d.jandaDuda, d.yatimPiatu, d.disabilitas, d.jenisDisabilitas, '', '', calculateAge(d.tanggalLahir)
+      ];
+      t += `<tr>${row.map(v => `<td>${safeStr(v)}</td>`).join('')}</tr>`;
+    });
+    
+    t += `</table></body></html>`;
+    const blob = new Blob([t], { type: "application/vnd.ms-excel" }); 
+    const l = document.createElement("a"); l.href = URL.createObjectURL(blob); 
+    l.download = `Data_Laporan_Sinode_SILOFETOMONE.xls`; 
+    document.body.appendChild(l); l.click(); document.body.removeChild(l);
   };
 
   const handleImportCSV = async (e) => {
@@ -716,7 +760,7 @@ export default function App() {
       dataToSave.namaLengkap = dataToSave.kepalaKeluarga;
       dataToSave.statusKeluarga = 'Kepala Keluarga';
       
-      // FITUR 4: MAGIC LOGIC (Pindah Rayon Sekeluarga)
+      // FITUR MAGIC LOGIC UPDATE KELUARGA MASSAL
       if (modalMode === 'editKk') {
           const originalKkData = jemaatData.find(d => d.dbId === docId);
           const oldIdKk = originalKkData?.idKk;
@@ -929,7 +973,7 @@ export default function App() {
                     <div className="md:col-span-2 bg-gray-100 p-5 rounded-xl border border-gray-200">
                       <h4 className="font-bold text-gray-800 mb-3 border-b pb-2"><Lock className="w-4 h-4 inline mr-2"/> Data KK (Terkunci)</h4>
                       
-                      {/* FITUR 3: Buka Kunci Kepala Keluarga & Filter Rayon Khusus Form Jemaat */}
+                      {/* FITUR Buka Kunci Kepala Keluarga & Filter Rayon Khusus Form Jemaat untuk Admin */}
                       {(modalMode === 'addJemaat' || modalMode === 'editJemaat') && (appUser?.role === 'admin' || appUser?.role === 'penatua') && (
                         <div className="mb-5 bg-blue-50 p-4 rounded-lg border border-blue-200">
                           <label className="text-sm font-bold text-blue-900 block mb-1">Saring Berdasarkan Rayon Terlebih Dahulu</label>
@@ -940,7 +984,7 @@ export default function App() {
 
                           <label className="text-sm font-bold text-blue-900 block mb-1">Pilih Kepala Keluarga</label>
                           <select value={formData.idKk || ''} onChange={(e) => {
-                              const kk = jemaatData.find(k => k.idKk === e.target.value && k.statusKeluarga === 'Kepala Keluarga');
+                              const kk = (jemaatData || []).find(k => k.idKk === e.target.value && k.statusKeluarga === 'Kepala Keluarga');
                               if(kk) {
                                 setFormData(p => ({
                                   ...p,
@@ -955,7 +999,7 @@ export default function App() {
                               }
                             }} className="w-full border-2 border-blue-300 p-2.5 rounded-lg bg-white outline-none" >
                             <option value="">-- Pilih KK --</option>
-                            {jemaatData
+                            {(jemaatData || [])
                               .filter(d=>d.statusKeluarga==='Kepala Keluarga' && (!formData.filterRayonModal || d.noRayon === formData.filterRayonModal))
                               .sort((a,b) => parseInt(a.urutanKk) - parseInt(b.urutanKk))
                               .map((k,idx) => <option key={idx} value={k.idKk}>{k.idKk} - {k.kepalaKeluarga}</option>)}
@@ -1072,8 +1116,8 @@ export default function App() {
                       <label className="text-xs font-semibold text-gray-600 mb-1 block">Pilih ID KK</label>
                       <select disabled={!formData.noRayon} name="idKk" value={formData.idKk||''} onChange={e=>{handleFormChange(e); setFormData(p=>({...p, jemaatDbId: ''}))}} className="w-full border p-2 rounded bg-gray-50 disabled:bg-gray-200 outline-none">
                          <option value="">-Pilih-</option>
-                         {[...new Set(jemaatData.filter(d => d.noRayon === formData.noRayon && d.statusKeanggotaan !== 'Meninggal' && d.statusKeanggotaan !== 'Pindah').map(d => d.idKk))].map(k=>{
-                            const kNama = jemaatData.find(x => x.idKk === k && x.statusKeluarga === 'Kepala Keluarga')?.namaLengkap || 'Tanpa Nama';
+                         {[...new Set((jemaatData || []).filter(d => d.noRayon === formData.noRayon && d.statusKeanggotaan !== 'Meninggal' && d.statusKeanggotaan !== 'Pindah').map(d => d.idKk))].map(k=>{
+                            const kNama = (jemaatData || []).find(x => x.idKk === k && x.statusKeluarga === 'Kepala Keluarga')?.namaLengkap || 'Tanpa Nama';
                             return <option key={k} value={k}>{k} - {kNama}</option>;
                          })}
                       </select>
@@ -1082,7 +1126,7 @@ export default function App() {
                       <label className="text-xs font-semibold text-gray-600 mb-1 block">Pilih Jemaat</label>
                       <select disabled={!formData.idKk} name="jemaatDbId" value={formData.jemaatDbId||''} onChange={handleFormChange} className="w-full border p-2 rounded bg-gray-50 disabled:bg-gray-200 outline-none">
                          <option value="">-Pilih-</option>
-                         {jemaatData.filter(d => d.idKk === formData.idKk && d.statusKeanggotaan !== 'Meninggal' && d.statusKeanggotaan !== 'Pindah').map((j,i)=><option key={j.dbId} value={j.dbId}>{j.namaLengkap} ({j.statusKeluarga})</option>)}
+                         {(jemaatData || []).filter(d => d.idKk === formData.idKk && d.statusKeanggotaan !== 'Meninggal' && d.statusKeanggotaan !== 'Pindah').map((j,i)=><option key={j.dbId} value={j.dbId}>{j.namaLengkap} ({j.statusKeluarga})</option>)}
                       </select>
                     </div>
                     <hr className="my-5 border-gray-300"/>
@@ -1249,7 +1293,19 @@ export default function App() {
                       {activeTab === 'Data Jemaat' && subTabJemaat !== 'Infografis' && appUser?.role === 'admin' && (
                         <div className="relative">
                             <button onClick={() => setShowMenuOps(!showMenuOps)} className="flex items-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95">Opsi Lain <ChevronDown className={`w-4 h-4 transform transition-transform ${showMenuOps ? 'rotate-180' : ''}`} /></button>
-                            {showMenuOps && ( <><div className="fixed inset-0 z-40" onClick={() => setShowMenuOps(false)}></div><div className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-2 duration-200"><button onClick={() => { setShowMenuOps(false); handleExportCSV(); }} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left text-sm font-bold text-gray-700"><Download className="w-4 h-4 text-emerald-600"/> Download Excel</button><button onClick={() => { setShowMenuOps(false); fileInputRef.current.click(); }} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left text-sm font-bold text-gray-700"><FileUp className="w-4 h-4 text-amber-500"/> Import CSV</button><div className="h-px bg-gray-100 w-full"></div><button onClick={() => { setShowMenuOps(false); handleCleanAll('jemaat'); }} className="flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-left text-sm font-bold text-red-600"><Trash2 className="w-4 h-4"/> Kosongkan Data</button></div></> )}
+                            {showMenuOps && ( 
+                                <>
+                                  <div className="fixed inset-0 z-40" onClick={() => setShowMenuOps(false)}></div>
+                                  <div className="absolute left-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-2 duration-200">
+                                     {/* FITUR BARU: Export Sinode */}
+                                     <button onClick={() => { setShowMenuOps(false); handleExportSinode(); }} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 text-left text-sm font-bold text-blue-700"><Download className="w-4 h-4 text-blue-600"/> Laporan ke Sinode</button>
+                                     <button onClick={() => { setShowMenuOps(false); handleExportCSV(); }} className="flex items-center gap-3 px-4 py-3 hover:bg-emerald-50 text-left text-sm font-bold text-emerald-700"><Download className="w-4 h-4 text-emerald-600"/> Download Excel</button>
+                                     <button onClick={() => { setShowMenuOps(false); fileInputRef.current.click(); }} className="flex items-center gap-3 px-4 py-3 hover:bg-amber-50 text-left text-sm font-bold text-amber-700"><FileUp className="w-4 h-4 text-amber-500"/> Import CSV</button>
+                                     <div className="h-px bg-gray-100 w-full"></div>
+                                     <button onClick={() => { setShowMenuOps(false); handleCleanAll('jemaat'); }} className="flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-left text-sm font-bold text-red-600"><Trash2 className="w-4 h-4"/> Kosongkan Data</button>
+                                  </div>
+                                </> 
+                            )}
                         </div>
                       )}
                       
