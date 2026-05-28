@@ -332,7 +332,7 @@ function PrintMajelisTemplate({ majelisToPrint, majelisData, penatuaMap, profilG
        <div className="text-center mb-6 border-b-4 border-double border-black pb-4">
            <img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-20 h-20 mx-auto mb-2" />
            <h1 className="text-2xl font-black uppercase">PROFIL PELAYAN / MAJELIS JEMAAT</h1>
-           <h2 className="text-lg font-bold uppercase">{profilGereja?.sinode || 'GMIT'} - KLASIS {profilGereja?.klasis || '-'}</h2>
+           <h2 className="text-lg font-bold uppercase">{profilGereja?.sinode || 'GEREJA MASEHI INJILI DI TIMOR'} - KLASIS {profilGereja?.klasis || '-'}</h2>
            <h3 className="text-md font-bold uppercase">JEMAAT {profilGereja?.jemaat || ''} {profilGereja?.mataJemaat && profilGereja.mataJemaat !== '-' ? `- MATA JEMAAT ${profilGereja.mataJemaat}` : ''} - RAYON {safeStr(mj.noRayon)}</h3>
            <p className="text-xs italic mb-2">{profilGereja?.alamat || ''}</p>
        </div>
@@ -411,7 +411,7 @@ function PrintListTemplate({ listToPrint, tabCols, filteredData, filterRayon, fi
        <div className="text-center mb-6 border-b-4 border-double border-black pb-4">
           <img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-20 h-20 mx-auto mb-2" />
           <h1 className="text-2xl font-black uppercase">LAPORAN DATA {safeStr(listToPrint).toUpperCase()}</h1>
-          <h2 className="text-lg font-bold uppercase">{profilGereja?.sinode || 'GMIT'} - KLASIS {profilGereja?.klasis || '-'}</h2>
+          <h2 className="text-lg font-bold uppercase">{profilGereja?.sinode || 'GEREJA MASEHI INJILI DI TIMOR'} - KLASIS {profilGereja?.klasis || '-'}</h2>
           <h3 className="text-md font-bold uppercase">JEMAAT {profilGereja?.jemaat || ''} {profilGereja?.mataJemaat && profilGereja.mataJemaat !== '-' ? `- MATA JEMAAT ${profilGereja.mataJemaat}` : ''}</h3>
           <p className="font-semibold mt-2">Filter: Rayon {safeStr(filterRayon)} {listToPrint === 'Pelayanan Kategori' ? `| Kategori: ${safeStr(filterKategori)}` : ''}</p>
        </div>
@@ -460,8 +460,9 @@ function LoginScreen({ onLogin, penatuaMap, penatuaPassMap, profilGereja }) {
       <div className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md border border-gray-100">
         <div className="flex flex-col items-center mb-8">
           <img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-24 h-24 mb-4 bg-white rounded-full shadow-sm p-1" />
-          <h1 className="text-2xl font-black text-gray-800 text-center tracking-tight uppercase">{profilGereja?.sinode || 'GMIT'}</h1>
-          <p className="text-gray-500 font-medium text-center uppercase">{profilGereja?.jemaat || 'NAMA JEMAAT'} {profilGereja?.mataJemaat && profilGereja.mataJemaat !== '-' ? `- ${profilGereja.mataJemaat}` : ''}</p>
+          <h1 className="text-xl font-black text-gray-800 text-center tracking-tight uppercase">{profilGereja?.sinode || 'Gereja Masehi Injili di Timor'}</h1>
+          <p className="text-gray-600 font-bold text-center uppercase text-sm mt-2">KLASIS {profilGereja?.klasis || '-'}</p>
+          <p className="text-gray-500 font-medium text-center uppercase text-sm">JEMAAT {profilGereja?.jemaat || 'NAMA JEMAAT'} {profilGereja?.mataJemaat && profilGereja.mataJemaat !== '-' ? ` - MATA JEMAAT ${profilGereja.mataJemaat}` : ''}</p>
         </div>
         {errorMsg && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 font-semibold text-center">{errorMsg}</div>}
         <form onSubmit={handleLogin} className="space-y-4">
@@ -1193,12 +1194,26 @@ export default function App() {
 
       {/* Main UI */}
       <div className={printMode !== null ? 'hidden' : 'block'}>
-        <header className="fixed top-4 left-4 right-4 bg-white/95 backdrop-blur-md rounded-3xl shadow-sm z-40 px-6 py-4 border border-gray-200 flex items-center justify-between print:hidden">
+        
+        {/* --- HEADER START --- */}
+        <header className="sticky top-4 mx-4 mt-4 bg-white/95 backdrop-blur-md rounded-3xl shadow-sm z-40 px-6 py-4 border border-gray-200 flex items-center justify-between print:hidden">
           <div className="flex items-center gap-4">
-            <img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-12 h-12 object-contain bg-white rounded-full p-1 shadow-sm border border-gray-100" />
+            <img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-14 h-14 object-contain bg-white rounded-full p-1 shadow-sm border border-gray-100 shrink-0" />
             <div>
-              <h1 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight uppercase">{profilGereja?.sinode || 'GMIT'} - {profilGereja?.jemaat || 'JEMAAT'}</h1>
-              <div className="text-xs text-blue-600 font-bold hidden md:flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div> KLASIS {profilGereja?.klasis || '-'} • {profilGereja?.mataJemaat && profilGereja.mataJemaat !== '-' ? `MATA JEMAAT ${profilGereja.mataJemaat}` : 'PUSAT'} • Akses: <span className="uppercase">{appUser?.role}</span></div>
+              <h1 className="text-lg md:text-xl font-black text-gray-900 tracking-tight uppercase leading-tight mb-1">
+                {profilGereja?.sinode || 'Gereja Masehi Injili di Timor'}
+              </h1>
+              <div className="text-[10px] md:text-xs text-blue-700 font-bold hidden md:flex flex-col leading-tight">
+                <span>KLASIS {profilGereja?.klasis || '-'}</span>
+                <span>JEMAAT {profilGereja?.jemaat || '-'}</span>
+                {profilGereja?.mataJemaat && profilGereja.mataJemaat !== '-' && (
+                  <span>MATA JEMAAT {profilGereja.mataJemaat}</span>
+                )}
+                <div className="flex items-center gap-1.5 mt-1.5 text-gray-600">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div> 
+                  Akses: <span className="uppercase text-green-600">{appUser?.role}</span>
+                </div>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2 lg:gap-4">
@@ -1213,8 +1228,10 @@ export default function App() {
             <button onClick={() => setAppUser(null)} className="flex items-center gap-1 bg-red-50 hover:bg-red-500 hover:text-white text-red-600 px-4 py-2.5 rounded-full text-sm font-black transition-colors shadow-sm"><LogOut className="w-4 h-4"/> <span className="hidden sm:inline">Keluar</span></button>
           </div>
         </header>
+        {/* --- HEADER END --- */}
 
-        <main className="pt-28 px-4 md:px-8 max-w-[98%] mx-auto print:pt-4 print:px-0">
+        {/* --- MAIN START --- */}
+        <main className="mt-8 px-4 md:px-8 max-w-[98%] mx-auto print:mt-4 print:px-0">
            <div className="flex lg:hidden overflow-x-auto gap-2 pb-4 mb-4 scrollbar-hide print:hidden">
              {['Data KK', 'Data Jemaat', 'Profil Majelis', 'Status Jemaat', ...(appUser?.role === 'admin' ? ['Riwayat Sistem', 'Manajemen Data & Pengaturan'] : [])].map((tab) => (
               <button key={tab} onClick={() => {setActiveTab(tab); setSortConfig({key:null, direction:'asc'});}} className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition-all ${activeTab === tab ? 'bg-blue-600 text-white shadow-md' : 'bg-white border-2 text-gray-600 hover:bg-gray-100'}`}>{tab}</button>
