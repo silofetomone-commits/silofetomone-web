@@ -14,7 +14,6 @@ const firebaseConfig = {
   appId: "1:910711011058:web:e6a1731f6a05d42352026b",
   measurementId: "G-RY2XJ5JG19"
 };
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -22,17 +21,13 @@ const db = getFirestore(app);
 // --- CONSTANTS ---
 const DEFAULT_PENATUA = { '1': "Penatua Veni Isabela Nokas", '2': "Penatua Deni Toto", '3': "Penatua Hesti Tungga", '4': "Penatua Welhelmina Bonlai" };
 const DEFAULT_PROFIL = { sinode: "Gereja Masehi Injili di Timor (GMIT)", klasis: "Nama Klasis", jemaat: "Silofetomone", mataJemaat: "-", alamat: "Alamat Gereja" };
-
 const PEKERJAAN_LIST = ["Tidak/Belum bekerja", "Ibu Rumah Tangga", "Pelajar", "Mahasiswa", "Pensiunan", "PNS", "TNI", "POLRI", "Tenaga Kontrak/Honorer", "Karyawan Swasta", "Pembantu Rumah Tangga", "Buruh/Serabutan", "Petani", "Peternak", "Nelayan", "Pedagang", "Pengrajin", "Penjahit", "Tukang Cukur", "Seniman", "Konsultan", "Kontraktor", "Pekerja Migran", "Wiraswasta lainnya", "Guru", "Dosen", "Pendeta", "Dokter", "Bidan/Perawat", "Lainnya"];
 const KATEGORI_PELAYANAN = ["Semua Kategori", "Lansia Laki-laki (>= 60 tahun)", "Lansia Perempuan (>= 60 tahun)", "Bapak GMIT (35-59 tahun)", "Perempuan GMIT (35-59 tahun)", "Pemuda Laki-laki (17-34 tahun)", "Pemuda Perempuan (17-34 tahun)", "Teruna Laki-laki (15-16 tahun)", "Teruna Perempuan (15-16 tahun)", "Remaja Laki-laki (12-14 tahun)", "Remaja Perempuan (12-14 tahun)", "Anak-anak Laki-laki (5-11 tahun)", "Anak-anak Perempuan (5-11 tahun)", "Balita Laki-laki (0-4 tahun)", "Balita Perempuan (0-4 tahun)"];
 const NAMA_BULAN = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-
 const JEMAAT_HEADERS = ["ID KK", "Kepala Keluarga", "No Rayon", "Urutan KK", "Bentuk Rumah", "Status Rumah", "Penatua Rayon", "No Anggota", "ID Jemaat", "Nama Lengkap", "NIK", "Jenis Kelamin", "Golongan Darah", "Tempat Lahir", "Tanggal Lahir", "Usia", "Alamat Domisili", "Suku Ayah", "Suku Ibu", "Status Keluarga", "Baptis", "Gereja Baptis", "Tgl Baptis", "Pendeta Baptis", "Sidi", "Gereja Sidi", "Tgl Sidi", "Pendeta Sidi", "Nikah", "Jenis Nikah", "Gereja Nikah", "Tgl Nikah", "Pendeta Nikah", "Pendidikan", "Pekerjaan", "Penghasilan", "Asuransi Kesehatan", "Jaminan", "Janda/Duda", "Yatim/Piatu", "Disabilitas", "Jenis Disabilitas", "Jabatan di Jemaat", "Jabatan di Masyarakat", "Status Keanggotaan", "Tanggal Kematian", "Tanggal Penguburan", "Pindah Ke Gereja", "Tanggal Pindah", "Asal Jemaat", "Tanggal Masuk"];
-const JEMAAT_HEADER_MAP = { "ID KK": "idKk", "Kepala Keluarga": "kepalaKeluarga", "No Rayon": "noRayon", "Urutan KK": "urutanKk", "Bentuk Rumah": "bentukRumah", "Status Rumah": "statusRumah", "Penatua Rayon": "penatua", "No Anggota": "noAnggota", "ID Jemaat": "idJemaat", "Nama Lengkap": "namaLengkap", "NIK": "nik", "Jenis Kelamin": "jk", "Golongan Darah": "goldar", "Tempat Lahir": "tempatLahir", "Tanggal Lahir": "tanggalLahir", "Alamat Domisili": "alamat", "Suku Ayah": "sukuAyah", "Suku Ibu": "sukuIbu", "Status Keluarga": "statusKeluarga", "Baptis": "baptis", "Nama Gereja Baptis": "gerejaBaptis", "Tanggal Baptis": "tanggalBaptis", "Pendeta yang Baptis": "pendetaBaptis", "Sudah Sidi": "sidi", "Nama Gereja Sidi": "gerejaSidi", "Tanggal Sidi": "tanggalSidi", "Pendeta yang Sidi": "pendetaSidi", "Sudah Nikah": "nikah", "Nama Gereja Pemberkatan Nikah": "gerejaNikah", "Tanggal Pemberkatan Nikah": "tanggalNikah", "Pendeta yang Berkat Nikah": "pendetaNikah", "Jenis Nikah": "jenisNikah", "Pendidikan": "pendidikan", "Pekerjaan": "pekerjaan", "Penghasilan": "penghasilan", "Asuransi Kesehatan": "asuransi", "Jaminan": "jaminan", "Janda/Duda": "jandaDuda", "Yatim Piatu": "yatimPiatu", "Yatim/Piatu": "yatimPiatu", "Disabilitas": "disabilitas", "Jenis Disabilitas": "jenisDisabilitas", "Jabatan dalam Jemaat": "jabatanJemaat", "Jabatan di Jemaat": "jabatanJemaat", "Jabatan dalam Masyarakat": "jabatanMasyarakat", "Jabatan di Masyarakat": "jabatanMasyarakat", "Status Keanggotaan": "statusKeanggotaan", "Tanggal Kematian": "tanggalKematian", "Tanggal Penguburan": "tanggalPenguburan", "Pindah Ke Gereja": "pindahKeJemaat", "Tanggal Pindah": "tanggalPindah", "Asal Jemaat": "asalJemaat", "Tanggal Masuk": "tanggalMasuk" };
-
+const JEMAAT_HEADER_MAP = { "ID KK": "idKk", "Kepala Keluarga": "kepalaKeluarga", "No Rayon": "noRayon", "Urutan KK": "urutanKk", "Bentuk Rumah": "bentukRumah", "Status Rumah": "statusRumah", "Penatua Rayon": "penatua", "No Anggota": "noAnggota", "ID Jemaat": "idJemaat", "Nama Lengkap": "namaLengkap", "NIK": "nik", "Jenis Kelamin": "jk", "Golongan Darah": "goldar", "Tempat Lahir": "tempatLahir", "Tanggal Lahir": "tanggalLahir", "Alamat Domisili": "alamat", "Suku Ayah": "sukuAyah", "Suku Ibu": "statusKeluarga", "Status Keluarga": "statusKeluarga", "Baptis": "baptis", "Nama Gereja Baptis": "gerejaBaptis", "Tanggal Baptis": "tanggalBaptis", "Pendeta yang Baptis": "pendetaBaptis", "Sudah Sidi": "sidi", "Nama Gereja Sidi": "gerejaSidi", "Tanggal Sidi": "tanggalSidi", "Pendeta yang Sidi": "pendetaSidi", "Sudah Nikah": "nikah", "Nama Gereja Pemberkatan Nikah": "gerejaNikah", "Tanggal Pemberkatan Nikah": "tanggalNikah", "Pendeta yang Berkat Nikah": "pendetaNikah", "Jenis Nikah": "jenisNikah", "Pendidikan": "pendidikan", "Pekerjaan": "pekerjaan", "Penghasilan": "penghasilan", "Asuransi Kesehatan": "asuransi", "Jaminan": "jaminan", "Janda/Duda": "jandaDuda", "Yatim Piatu": "yatimPiatu", "Yatim/Piatu": "yatimPiatu", "Disabilitas": "disabilitas", "Jenis Disabilitas": "jenisDisabilitas", "Jabatan dalam Jemaat": "jabatanJemaat", "Jabatan di Jemaat": "jabatanJemaat", "Jabatan dalam Masyarakat": "jabatanMasyarakat", "Jabatan di Masyarakat": "jabatanMasyarakat", "Status Keanggotaan": "statusKeanggotaan", "Tanggal Kematian": "tanggalKematian", "Tanggal Penguburan": "tanggalPenguburan", "Pindah Ke Gereja": "pindahKeJemaat", "Tanggal Pindah": "tanggalPindah", "Asal Jemaat": "asalJemaat", "Tanggal Masuk": "tanggalMasuk" };
 const MAJELIS_HEADERS = ["Nomor Rayon", "Nama Lengkap", "Nama Panggilan", "Tempat Lahir", "Tanggal Lahir", "Jenis Kelamin", "Status Menikah", "Pekerjaan", "Jabatan di Masyarakat", "Jabatan Pelayanan", "Jumlah Saudara", "Anak Ke", "Golongan Darah", "Gereja Baptis", "Tanggal Baptis", "Gereja Sidi", "Tanggal Sidi", "Gereja Nikah", "Tanggal Nikah", "Nama Ayah", "Nama Ibu", "Nama Suami/Istri", "Tempat Lahir Pasangan", "Tanggal Lahir Pasangan", "Pekerjaan Pasangan", "Gereja Baptis Pasangan", "Tanggal Baptis Pasangan", "Gereja Sidi Pasangan", "Tanggal Sidi Pasangan", "Nama SD", "Tahun Tamat SD", "Nama SMP", "Tahun Tamat SMP", "Nama SMA", "Tahun Tamat SMA", "Nama PT", "Tahun Lulus PT", "Pernah melayani di Gereja?", "Jabatan Lama", "Periode Pelayanan"];
 const MAJELIS_HEADER_MAP = { "Nomor Rayon": "noRayon", "Nama Lengkap": "namaLengkap", "Nama Panggilan": "namaPanggilan", "Tempat Lahir": "tanggalLahir", "Jenis Kelamin": "jk", "Status Menikah": "statusMenikah", "Pekerjaan": "pekerjaan", "Jabatan di Masyarakat": "jabatanMasyarakat", "Jabatan Pelayanan": "jabatanPelayanan", "Jumlah Saudara": "jumlahSaudara", "Anak Ke": "anakKe", "Golongan Darah": "goldar", "Gereja Baptis": "gerejaBaptis", "Tanggal Baptis": "tanggalBaptis", "Gereja Sidi": "gerejaSidi", "Tanggal Sidi": "tanggalSidi", "Gereja Nikah": "gerejaNikah", "Tanggal Nikah": "tanggalNikah", "Nama Ayah": "namaAyah", "Nama Ibu": "namaIbu", "Nama Suami/Istri": "namaPasangan", "Tempat Lahir Pasangan": "tempatLahirPasangan", "Tanggal Lahir Pasangan": "tanggalLahirPasangan", "Pekerjaan Pasangan": "pekerjaanPasangan", "Gereja Baptis Pasangan": "gerejaBaptisPasangan", "Tanggal Baptis Pasangan": "tanggalBaptisPasangan", "Gereja Sidi Pasangan": "gerejaSidi Pasangan", "Tanggal Sidi Pasangan": "tanggalSidiPasangan", "Nama SD": "namaSD", "Tahun Tamat SD": "tahunSD", "Nama SMP": "namaSMP", "Tahun Tamat SMP": "tahunSMP", "Nama SMA": "namaSMA", "Tahun Tamat SMA": "tahunSMA", "Nama PT": "namaPT", "Tahun Lulus PT": "tahunPT", "Pernah melayani di Gereja?": "pernahMelayani", "Jabatan Lama": "jabatanLama", "Periode Pelayanan": "periodePelayanan" };
-
 const FORM_MAJELIS = [
   {t: 'Profil Dasar', f: [
     {l:'Nomor Rayon', k:'noRayon', t:'sel', opts:['1','2','3','4']}, {l:'Nama Lengkap', k:'namaLengkap', req:true}, {l:'Nama Panggilan', k:'namaPanggilan'}, {l:'Tempat Lahir', k:'tempatLahir'}, {l:'Tanggal Lahir', k:'tanggalLahir', t:'date'}, {l:'Jenis Kelamin', k:'jk', t:'sel', opts:['Laki-laki', 'Perempuan']},
@@ -50,7 +45,6 @@ const FORM_MAJELIS = [
     {l:'Pernah melayani?', k:'pernahMelayani'}, {l:'Jabatan Lama', k:'jabatanLama'}, {l:'Periode Pelayanan', k:'periodePelayanan'}
   ]}
 ];
-
 const JEMAAT_FIELDS_PRIBADI = [
   { name: 'noAnggota', label: 'No Anggota Keluarga Ke-', type: 'select', req: true, opts: [] },
   { name: 'namaLengkap', label: 'Nama Lengkap', req: true }, { name: 'nik', label: 'NIK' }, { name: 'jk', label: 'Jenis Kelamin', type: 'select', opts: ['Laki-laki', 'Perempuan'] },
@@ -58,7 +52,6 @@ const JEMAAT_FIELDS_PRIBADI = [
   { name: 'alamat', label: 'Alamat Domisili Lengkap', span: 2 }, { name: 'sukuAyah', label: 'Suku Ayah' }, { name: 'sukuIbu', label: 'Suku Ibu' },
   { name: 'statusKeluarga', label: 'Status Dalam Keluarga', type: 'select', span: 2, opts: ['Kepala Keluarga', 'Istri', 'Anak kandung', 'Anak Angkat/asuh', 'Orangtua/Mertua', 'Kakek/Nenek', 'Saudara/Adik/Kakak', 'Cucu', 'Keponakan', 'Menantu', 'Famili/ipar', 'Lain-lain/Kost/Karyawan/Pembantu'] }
 ];
-
 const JEMAAT_EDU = [
   { name: 'pendidikan', label: 'Pendidikan', type: 'select', opts: ['Tidak/Belum Sekolah', 'Tidak Tamat SD', 'SD', 'SMP/sederajat', 'SMA/sederajat', 'D I', 'D II', 'D III', 'D IV', 'S1', 'S2', 'S3'] },
   { name: 'pekerjaan', label: 'Pekerjaan', type: 'select', opts: PEKERJAAN_LIST }, { name: 'penghasilan', label: 'Penghasilan', type: 'select', opts: ['Tidak/belum ada penghasilan', 'dibawah Rp. 1 juta', 'Rp. 1 juta s/d Rp. 2.5 juta', 'Rp. 2.5 juta s/d Rp. 5 juta', 'diatas Rp. 5 juta'] }
@@ -72,7 +65,6 @@ const isP = jk => String(jk||'').toLowerCase().startsWith('p');
 
 const toInputDate = d => (d && typeof d==='string' && d.includes('/')) ? `${d.split('/')[2]}-${pad0(d.split('/')[1])}-${pad0(d.split('/')[0])}` : (d||'');
 const toDisplayDate = d => (d && typeof d==='string' && d.includes('-')) ? `${d.split('-')[2]}-${d.split('-')[1]}-${d.split('-')[0]}` : (d||'-');
-
 function calculateAge(dob) {
   if (!dob || typeof dob !== 'string') return 0;
   let bd;
@@ -91,7 +83,6 @@ function parseCSV(str) {
   const res = [];
   let row = [], cell = '', inQ = false;
   const delim = (str.split('\n')[0].split(';').length > str.split('\n')[0].split(',').length) ? ';' : ',';
-  
   for (let i = 0; i < str.length; i++) {
     const c = str[i];
     if (c === '"') { if (i+1 < str.length && str[i+1] === '"') { cell += '"'; i++; } else inQ = !inQ; } 
@@ -197,7 +188,6 @@ function FormInput({ label, name, value, onChange, type="text", req=false, dis=f
 
 function InfografisTab({ data, filterRayon, type }) {
   const dAktif = data.filter(d => (type === 'majelis' || (d.statusKeanggotaan !== 'Meninggal' && d.statusKeanggotaan !== 'Pindah' && d.statusHidup !== 'Meninggal')) && (filterRayon === 'Semua' || String(d.noRayon) === filterRayon));
-  
   if (type === 'majelis') {
      const countStats = (jabatan) => {
         const d = dAktif.filter(x => String(x.jabatanPelayanan).toLowerCase() === jabatan.toLowerCase());
@@ -250,17 +240,17 @@ function PrintKkTemplate({ kkToPrint, jemaatData, penatuaMap, profilGereja, onBa
   if (!kkToPrint) return null;
   const dataKk = jemaatData.find(d => d.idKk === kkToPrint && d.statusKeluarga === 'Kepala Keluarga');
   const anggotaKk = jemaatData.filter(d => d.idKk === kkToPrint && d.statusKeanggotaan !== 'Meninggal' && d.statusKeanggotaan !== 'Pindah').sort((a,b) => parseInt(a.noAnggota) - parseInt(b.noAnggota));
-  
   if (!dataKk) return null;
   const b = "border border-black p-1";
-  
   return (
     <div className="w-full bg-white text-black p-4 text-[11px] font-sans">
        <style type="text/css">{`@page { size: landscape; margin: 10mm; }`}</style>
        <div className="flex justify-between items-center mb-4 border-b-2 border-black pb-2">
           <div>
               <h1 className="text-xl font-bold uppercase tracking-wider">{profilGereja?.sinode || 'GEREJA MASEHI INJILI DI TIMOR (GMIT)'}</h1>
-              <h2 className="text-lg font-bold uppercase">DATA JEMAAT {profilGereja?.jemaat || ''}</h2>
+              <h2 className="text-lg font-bold uppercase">KLASIS {profilGereja?.klasis || '-'}</h2>
+              <h3 className="text-md font-bold uppercase">JEMAAT {profilGereja?.jemaat || ''} {profilGereja?.mataJemaat && profilGereja.mataJemaat !== '-' ? `- MATA JEMAAT ${profilGereja.mataJemaat}` : ''}</h3>
+              <p className="text-xs italic">{profilGereja?.alamat || ''}</p>
           </div>
           <div className="text-right"><img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-16 h-16 object-contain" /></div>
        </div>
@@ -339,7 +329,13 @@ function PrintMajelisTemplate({ majelisToPrint, majelisData, penatuaMap, profilG
   return (
     <div className="w-full bg-white text-black p-8 text-sm font-sans max-w-4xl mx-auto border shadow-lg print:border-none print:shadow-none print:m-0 print:p-0">
        <style type="text/css">{`@page { size: portrait; margin: 15mm; }`}</style>
-       <div className="text-center mb-6 border-b-4 border-double border-black pb-4"><img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-20 h-20 mx-auto mb-2" /><h1 className="text-2xl font-black uppercase">PROFIL PELAYAN / MAJELIS JEMAAT</h1><h2 className="text-lg font-bold uppercase">{profilGereja?.jemaat || ''} - RAYON {safeStr(mj.noRayon)}</h2></div>
+       <div className="text-center mb-6 border-b-4 border-double border-black pb-4">
+           <img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-20 h-20 mx-auto mb-2" />
+           <h1 className="text-2xl font-black uppercase">PROFIL PELAYAN / MAJELIS JEMAAT</h1>
+           <h2 className="text-lg font-bold uppercase">{profilGereja?.sinode || 'GMIT'} - KLASIS {profilGereja?.klasis || '-'}</h2>
+           <h3 className="text-md font-bold uppercase">JEMAAT {profilGereja?.jemaat || ''} {profilGereja?.mataJemaat && profilGereja.mataJemaat !== '-' ? `- MATA JEMAAT ${profilGereja.mataJemaat}` : ''} - RAYON {safeStr(mj.noRayon)}</h3>
+           <p className="text-xs italic mb-2">{profilGereja?.alamat || ''}</p>
+       </div>
        <div className="flex gap-8 mb-6">
           <div className="w-1/4">
              <div className="w-32 h-40 border-2 border-black p-1 bg-gray-50 flex items-center justify-center overflow-hidden">
@@ -415,7 +411,8 @@ function PrintListTemplate({ listToPrint, tabCols, filteredData, filterRayon, fi
        <div className="text-center mb-6 border-b-4 border-double border-black pb-4">
           <img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-20 h-20 mx-auto mb-2" />
           <h1 className="text-2xl font-black uppercase">LAPORAN DATA {safeStr(listToPrint).toUpperCase()}</h1>
-          <h2 className="text-lg font-bold uppercase">{profilGereja?.jemaat || ''}</h2>
+          <h2 className="text-lg font-bold uppercase">{profilGereja?.sinode || 'GMIT'} - KLASIS {profilGereja?.klasis || '-'}</h2>
+          <h3 className="text-md font-bold uppercase">JEMAAT {profilGereja?.jemaat || ''} {profilGereja?.mataJemaat && profilGereja.mataJemaat !== '-' ? `- MATA JEMAAT ${profilGereja.mataJemaat}` : ''}</h3>
           <p className="font-semibold mt-2">Filter: Rayon {safeStr(filterRayon)} {listToPrint === 'Pelayanan Kategori' ? `| Kategori: ${safeStr(filterKategori)}` : ''}</p>
        </div>
        <table className="w-full border-collapse border border-black text-xs text-center mb-8">
@@ -447,7 +444,7 @@ function LoginScreen({ onLogin, penatuaMap, penatuaPassMap, profilGereja }) {
   const [selectedRayon, setSelectedRayon] = useState('1');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
-  
+
   const handleLogin = (e) => {
     e.preventDefault(); setErrorMsg('');
     if (role === 'admin' && password !== 'admin123') return setErrorMsg('Password Admin salah!');
@@ -463,8 +460,8 @@ function LoginScreen({ onLogin, penatuaMap, penatuaPassMap, profilGereja }) {
       <div className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md border border-gray-100">
         <div className="flex flex-col items-center mb-8">
           <img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-24 h-24 mb-4 bg-white rounded-full shadow-sm p-1" />
-          <h1 className="text-2xl font-black text-gray-800 text-center tracking-tight">Sistem Informasi</h1>
-          <p className="text-gray-500 font-medium text-center uppercase">{profilGereja?.jemaat || 'SILOFETOMONE'}</p>
+          <h1 className="text-2xl font-black text-gray-800 text-center tracking-tight uppercase">{profilGereja?.sinode || 'GMIT'}</h1>
+          <p className="text-gray-500 font-medium text-center uppercase">{profilGereja?.jemaat || 'NAMA JEMAAT'} {profilGereja?.mataJemaat && profilGereja.mataJemaat !== '-' ? `- ${profilGereja.mataJemaat}` : ''}</p>
         </div>
         {errorMsg && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 font-semibold text-center">{errorMsg}</div>}
         <form onSubmit={handleLogin} className="space-y-4">
@@ -490,7 +487,6 @@ export default function App() {
   const [profilGereja, setProfilGereja] = useState(DEFAULT_PROFIL);
   const [isLoading, setIsLoading] = useState(true);
   const fileInputRef = useRef(null);
-  
   const [activeTab, setActiveTab] = useState('Data KK');
   const [subTabJemaat, setSubTabJemaat] = useState('Tabel Data');
   const [subTabMajelis, setSubTabMajelis] = useState('Tabel Data');
@@ -510,7 +506,9 @@ export default function App() {
   const [formData, setFormData] = useState({});
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
   const [alertDialog, setAlertDialog] = useState({ isOpen: false, title: '', message: '' });
-  const [showMenuOps, setShowMenuOps] = useState(false);
+  const showMenuOpsState = useState(false);
+  const showMenuOps = showMenuOpsState[0];
+  const setShowMenuOps = showMenuOpsState[1];
   
   const showAlert = (title, message) => setAlertDialog({ isOpen: true, title, message });
   
@@ -605,10 +603,11 @@ export default function App() {
     }
     
     t += `</table></body></html>`;
-    const blob = new Blob([t], { type: "application/vnd.ms-excel" }); const l = document.createElement("a"); l.href = URL.createObjectURL(blob); l.download = `Data_${typeName}_${(profilGereja?.jemaat || 'SILOFETOMONE').replace(/\s+/g, '_')}.xls`; document.body.appendChild(l);
+    const blob = new Blob([t], { type: "application/vnd.ms-excel" }); const l = document.createElement("a"); l.href = URL.createObjectURL(blob);
+    l.download = `Data_${typeName}_${(profilGereja?.jemaat || 'JEMAAT').replace(/\s+/g, '_')}.xls`; document.body.appendChild(l);
     l.click(); document.body.removeChild(l);
   };
-
+  
   const handleExportSinode = () => {
     let t = `<html xmlns:x="urn:schemas-microsoft-com:office:excel"><body><table border="1">`;
     const sinodeHeaders = [
@@ -648,7 +647,7 @@ export default function App() {
     t += `</table></body></html>`;
     const blob = new Blob([t], { type: "application/vnd.ms-excel" });
     const l = document.createElement("a"); l.href = URL.createObjectURL(blob); 
-    l.download = `Data_Laporan_Sinode_${(profilGereja?.jemaat || 'SILOFETOMONE').replace(/\s+/g, '_')}.xls`; 
+    l.download = `Data_Laporan_Sinode_${(profilGereja?.jemaat || 'JEMAAT').replace(/\s+/g, '_')}.xls`; 
     document.body.appendChild(l); l.click(); document.body.removeChild(l);
   };
   
@@ -662,11 +661,12 @@ export default function App() {
     reader.onload = async (event) => {
       const rows = parseCSV(event.target.result);
       if (rows.length < 2) { showAlert("Error", "Format CSV salah."); setIsLoading(false); return; }
+      
       const headers = rows[0].map(h => h.replace(/['"]+/g, '').trim());
       let successCount = 0, duplicateCount = 0;
       
       const targetData = isMajelis ? majelisData : jemaatData;
-      const existingIdentities = new Set(targetData.map(d => (d.namaLengkap||'').toLowerCase().trim()));
+      const existingIdentities = new Set(targetData.map(d => `${(d.namaLengkap||'').toLowerCase().trim()}_${(d.nik||d.noAnggota||'').toLowerCase().trim()}`));
 
       for (let i=1; i<rows.length; i++) {
         if(rows[i].length<2) continue; const d = {}; const ank = [{},{},{},{},{},{}];
@@ -711,21 +711,22 @@ export default function App() {
         if (isMajelis) d.anak = ank.filter(a => a.nama && a.nama.trim() !== '');
         if(!d.namaLengkap && !d.kepalaKeluarga) continue;
         
-        const idKey = (d.namaLengkap || '').toLowerCase().trim();
+        const idKey = `${(d.namaLengkap || '').toLowerCase().trim()}_${(d.nik||d.noAnggota||'').toLowerCase().trim()}`;
         if(existingIdentities.has(idKey)) { duplicateCount++; continue; }
 
         if(!isMajelis) { d.statusKeanggotaan = 'Aktif'; d.statusHidup = 'Hidup'; }
         
-        try { await addDoc(collection(db, typeName), d); successCount++; existingIdentities.add(idKey); } catch(e) {}
+        try { await addDoc(collection(db, typeName), d);
+        successCount++; existingIdentities.add(idKey); } catch(e) {}
       }
       
       recordHistory('IMPORT', typeName, `${successCount} Data CSV Masuk`);
-      showAlert('Selesai!', `Berhasil masuk: ${successCount} data.\nDitolak (Dobel Nama Lengkap): ${duplicateCount} data.`); 
+      showAlert('Selesai!', `Berhasil masuk: ${successCount} data.\nDitolak (Dobel Nama Lengkap & ID): ${duplicateCount} data.`); 
       setIsLoading(false);
     };
     reader.readAsText(file); e.target.value = ''; 
   };
-
+  
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -735,7 +736,7 @@ export default function App() {
       reader.readAsDataURL(file);
     }
   };
-
+  
   const saveDocument = async (collectionName, data, id = null) => {
     try {
       const cleanData = {};
@@ -772,7 +773,6 @@ export default function App() {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     const dataToSave = { ...formData }; const docId = dataToSave.dbId; delete dataToSave.dbId;
-    
     if (modalMode === 'addKk' || modalMode === 'editKk') {
       dataToSave.namaLengkap = dataToSave.kepalaKeluarga;
       dataToSave.statusKeluarga = 'Kepala Keluarga';
@@ -917,13 +917,13 @@ export default function App() {
     }
     return d;
   }, [jemaatData, majelisData, historyData, activeTab, activeSubTabStatus, searchTerm, filterRayon, filterKategori, filterBulan, filterHistoryAction, sortConfig]);
-
+  
   const totalItems = filteredData.length;
   const totalPages = itemsPerPage === 'Semua' ? 1 : Math.ceil(totalItems / itemsPerPage);
   const currentData = useMemo(() => itemsPerPage === 'Semua' ? filteredData : filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage), [filteredData, currentPage, itemsPerPage]);
   
   useEffect(() => { setCurrentPage(1); }, [activeTab, activeSubTabStatus, subTabJemaat, subTabMajelis, searchTerm, itemsPerPage, filterRayon, filterKategori, filterBulan, filterHistoryAction]);
-
+  
   if (!appUser) return <LoginScreen onLogin={setAppUser} penatuaMap={penatuaMap} penatuaPassMap={penatuaPassMap} profilGereja={profilGereja} />;
 
   return (
@@ -1061,13 +1061,10 @@ export default function App() {
                     <h4 className="md:col-span-2 font-bold text-gray-800 border-b pb-2 mt-4 text-lg">Kesehatan & Status Sosial</h4>
                     <FormInput label="Asuransi Kesehatan" name="asuransi" type="select" opts={['Ya','Tidak']} value={formData.asuransi} onChange={handleFormChange} />
                     <FormInput label="Jaminan" name="jaminan" type="select" opts={['BPJS/Askes','Asuransi Kesehatan lainnya']} dis={formData.asuransi!=='Ya'} value={formData.jaminan} onChange={handleFormChange} />
-                    
                     <FormInput label="Janda/Duda" name="jandaDuda" type="select" opts={['Tidak', 'Janda', 'Duda']} value={formData.jandaDuda} onChange={handleFormChange} />
                     <FormInput label="Yatim Piatu" name="yatimPiatu" type="select" opts={['Tidak', 'Yatim', 'Piatu', 'Yatim Piatu']} value={formData.yatimPiatu} onChange={handleFormChange} />
-                    
                     <FormInput label="Disabilitas" name="disabilitas" type="select" opts={['Ya','Tidak']} value={formData.disabilitas} onChange={handleFormChange} />
                     <FormInput label="Jenis Disabilitas" name="jenisDisabilitas" type="select" opts={['Tuna Netra', 'Tuna Rungu', 'Tuna Wicara', 'Tuna Daksa', 'Tuna Laras', 'Tuna Grahita']} dis={formData.disabilitas!=='Ya'} value={formData.jenisDisabilitas} onChange={handleFormChange} />
-                    
                     <FormInput label="Jabatan dalam Jemaat" name="jabatanJemaat" value={formData.jabatanJemaat} onChange={handleFormChange} />
                     <FormInput label="Jabatan di Masyarakat" name="jabatanMasyarakat" value={formData.jabatanMasyarakat} onChange={handleFormChange} />
                   </div>
@@ -1200,14 +1197,14 @@ export default function App() {
           <div className="flex items-center gap-4">
             <img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-12 h-12 object-contain bg-white rounded-full p-1 shadow-sm border border-gray-100" />
             <div>
-              <h1 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Sistem Data Terpadu</h1>
-              <div className="text-xs text-blue-600 font-bold hidden md:flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div> {profilGereja?.jemaat || 'SILOFETOMONE'} • Akses: <span className="uppercase">{appUser?.role}</span></div>
+              <h1 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight uppercase">{profilGereja?.sinode || 'GMIT'} - {profilGereja?.jemaat || 'JEMAAT'}</h1>
+              <div className="text-xs text-blue-600 font-bold hidden md:flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div> KLASIS {profilGereja?.klasis || '-'} • {profilGereja?.mataJemaat && profilGereja.mataJemaat !== '-' ? `MATA JEMAAT ${profilGereja.mataJemaat}` : 'PUSAT'} • Akses: <span className="uppercase">{appUser?.role}</span></div>
             </div>
           </div>
           <div className="flex items-center gap-2 lg:gap-4">
             <div className="hidden lg:flex gap-1 bg-gray-50 p-1.5 rounded-full border border-gray-200">
               {['Data KK', 'Data Jemaat', 'Profil Majelis', 'Status Jemaat', ...(appUser?.role === 'admin' ? ['Riwayat Sistem', 'Manajemen Data & Pengaturan'] : [])].map(tab => (
-                <button key={tab} onClick={() => {setActiveTab(tab); setSortConfig({key:null, direction:'asc'});}} className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${activeTab === tab ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}>
+                 <button key={tab} onClick={() => {setActiveTab(tab); setSortConfig({key:null, direction:'asc'});}} className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${activeTab === tab ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}>
                   {tab === 'Riwayat Sistem' ? <span className="flex items-center gap-1"><History className="w-4 h-4"/> Admin Log</span> : tab === 'Manajemen Data & Pengaturan' ? <span className="flex items-center gap-1"><Settings className="w-4 h-4"/> Pengaturan</span> : <span className="flex items-center gap-1">{tab === 'Profil Majelis' ? <UserCheck className="w-4 h-4"/> : null} {tab}</span>}
                 </button>
               ))}
@@ -1218,7 +1215,7 @@ export default function App() {
         </header>
 
         <main className="pt-28 px-4 md:px-8 max-w-[98%] mx-auto print:pt-4 print:px-0">
-          <div className="flex lg:hidden overflow-x-auto gap-2 pb-4 mb-4 scrollbar-hide print:hidden">
+           <div className="flex lg:hidden overflow-x-auto gap-2 pb-4 mb-4 scrollbar-hide print:hidden">
              {['Data KK', 'Data Jemaat', 'Profil Majelis', 'Status Jemaat', ...(appUser?.role === 'admin' ? ['Riwayat Sistem', 'Manajemen Data & Pengaturan'] : [])].map((tab) => (
               <button key={tab} onClick={() => {setActiveTab(tab); setSortConfig({key:null, direction:'asc'});}} className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition-all ${activeTab === tab ? 'bg-blue-600 text-white shadow-md' : 'bg-white border-2 text-gray-600 hover:bg-gray-100'}`}>{tab}</button>
             ))}
@@ -1270,7 +1267,7 @@ export default function App() {
             <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden print:border-none print:shadow-none">
               
               {activeTab === 'Manajemen Data & Pengaturan' ? (
-                <div className="p-8">
+                 <div className="p-8">
                    <div className="mb-8">
                       <h2 className="text-2xl font-black text-gray-800 flex items-center gap-2 mb-4"><Settings className="w-6 h-6 text-gray-600"/> Profil Gereja</h2>
                       <p className="text-gray-500 mb-4">Pengaturan ini akan diterapkan pada kop surat, cetakan dokumen, dan antarmuka aplikasi.</p>
@@ -1323,7 +1320,7 @@ export default function App() {
                       {activeTab === 'Data KK' && (appUser?.role === 'admin' || appUser?.role === 'penatua') && <button onClick={() => { setFormData({ penatua: appUser?.role === 'penatua' ? appUser?.name : '' }); setModalMode('addKk'); }} className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-md active:scale-95"><Plus className="w-4 h-4"/> Buat KK Baru</button>}
                       
                       {activeTab === 'Data Jemaat' && subTabJemaat !== 'Infografis' && (appUser?.role === 'admin' || appUser?.role === 'penatua') && (
-                         <button onClick={() => { setFormData({ penatua: appUser?.role === 'penatua' ? appUser?.name : '' }); setModalMode('addJemaat'); }} className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-md active:scale-95"><Plus className="w-4 h-4"/> Tambah Data Jemaat</button>
+                          <button onClick={() => { setFormData({ penatua: appUser?.role === 'penatua' ? appUser?.name : '' }); setModalMode('addJemaat'); }} className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-md active:scale-95"><Plus className="w-4 h-4"/> Tambah Data Jemaat</button>
                       )}
                       
                       {/* OPSI LAIN DATA JEMAAT HANYA UNTUK ADMIN */}
@@ -1334,7 +1331,6 @@ export default function App() {
                                 <>
                                   <div className="fixed inset-0 z-40" onClick={() => setShowMenuOps(false)}></div>
                                   <div className="absolute left-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-2 duration-200">
-                                     {/* FITUR BARU: Export Sinode */}
                                      <button onClick={() => { setShowMenuOps(false); handleExportSinode(); }} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 text-left text-sm font-bold text-blue-700"><Download className="w-4 h-4 text-blue-600"/> Laporan ke Sinode</button>
                                      <button onClick={() => { setShowMenuOps(false); handleExportCSV(); }} className="flex items-center gap-3 px-4 py-3 hover:bg-emerald-50 text-left text-sm font-bold text-emerald-700"><Download className="w-4 h-4 text-emerald-600"/> Download Excel</button>
                                      <button onClick={() => { setShowMenuOps(false); fileInputRef.current.click(); }} className="flex items-center gap-3 px-4 py-3 hover:bg-amber-50 text-left text-sm font-bold text-amber-700"><FileUp className="w-4 h-4 text-amber-500"/> Import CSV</button>
