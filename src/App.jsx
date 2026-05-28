@@ -4,7 +4,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, setDoc } from 'firebase/firestore';
 
-// --- FIREBASE PRIBADI GEREJA SILOFETOMONE ---
+// --- FIREBASE PRIBADI ---
 const firebaseConfig = {
   apiKey: "AIzaSyDFBNpi-yEYiOcd0qFQnjABE0oKxJ4twk0",
   authDomain: "db-silofetomone.firebaseapp.com",
@@ -21,11 +21,12 @@ const db = getFirestore(app);
 
 // --- CONSTANTS ---
 const DEFAULT_PENATUA = { '1': "Penatua Veni Isabela Nokas", '2': "Penatua Deni Toto", '3': "Penatua Hesti Tungga", '4': "Penatua Welhelmina Bonlai" };
+const DEFAULT_PROFIL = { sinode: "Gereja Masehi Injili di Timor (GMIT)", klasis: "Nama Klasis", jemaat: "Silofetomone", mataJemaat: "-", alamat: "Alamat Gereja" };
+
 const PEKERJAAN_LIST = ["Tidak/Belum bekerja", "Ibu Rumah Tangga", "Pelajar", "Mahasiswa", "Pensiunan", "PNS", "TNI", "POLRI", "Tenaga Kontrak/Honorer", "Karyawan Swasta", "Pembantu Rumah Tangga", "Buruh/Serabutan", "Petani", "Peternak", "Nelayan", "Pedagang", "Pengrajin", "Penjahit", "Tukang Cukur", "Seniman", "Konsultan", "Kontraktor", "Pekerja Migran", "Wiraswasta lainnya", "Guru", "Dosen", "Pendeta", "Dokter", "Bidan/Perawat", "Lainnya"];
 const KATEGORI_PELAYANAN = ["Semua Kategori", "Lansia Laki-laki (>= 60 tahun)", "Lansia Perempuan (>= 60 tahun)", "Bapak GMIT (35-59 tahun)", "Perempuan GMIT (35-59 tahun)", "Pemuda Laki-laki (17-34 tahun)", "Pemuda Perempuan (17-34 tahun)", "Teruna Laki-laki (15-16 tahun)", "Teruna Perempuan (15-16 tahun)", "Remaja Laki-laki (12-14 tahun)", "Remaja Perempuan (12-14 tahun)", "Anak-anak Laki-laki (5-11 tahun)", "Anak-anak Perempuan (5-11 tahun)", "Balita Laki-laki (0-4 tahun)", "Balita Perempuan (0-4 tahun)"];
 const NAMA_BULAN = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-// FITUR BARU: Penambahan Kolom Asal Jemaat dan Tanggal Masuk
 const JEMAAT_HEADERS = ["ID KK", "Kepala Keluarga", "No Rayon", "Urutan KK", "Bentuk Rumah", "Status Rumah", "Penatua Rayon", "No Anggota", "ID Jemaat", "Nama Lengkap", "NIK", "Jenis Kelamin", "Golongan Darah", "Tempat Lahir", "Tanggal Lahir", "Usia", "Alamat Domisili", "Suku Ayah", "Suku Ibu", "Status Keluarga", "Baptis", "Gereja Baptis", "Tgl Baptis", "Pendeta Baptis", "Sidi", "Gereja Sidi", "Tgl Sidi", "Pendeta Sidi", "Nikah", "Jenis Nikah", "Gereja Nikah", "Tgl Nikah", "Pendeta Nikah", "Pendidikan", "Pekerjaan", "Penghasilan", "Asuransi Kesehatan", "Jaminan", "Janda/Duda", "Yatim/Piatu", "Disabilitas", "Jenis Disabilitas", "Jabatan di Jemaat", "Jabatan di Masyarakat", "Status Keanggotaan", "Tanggal Kematian", "Tanggal Penguburan", "Pindah Ke Gereja", "Tanggal Pindah", "Asal Jemaat", "Tanggal Masuk"];
 const JEMAAT_HEADER_MAP = { "ID KK": "idKk", "Kepala Keluarga": "kepalaKeluarga", "No Rayon": "noRayon", "Urutan KK": "urutanKk", "Bentuk Rumah": "bentukRumah", "Status Rumah": "statusRumah", "Penatua Rayon": "penatua", "No Anggota": "noAnggota", "ID Jemaat": "idJemaat", "Nama Lengkap": "namaLengkap", "NIK": "nik", "Jenis Kelamin": "jk", "Golongan Darah": "goldar", "Tempat Lahir": "tempatLahir", "Tanggal Lahir": "tanggalLahir", "Alamat Domisili": "alamat", "Suku Ayah": "sukuAyah", "Suku Ibu": "sukuIbu", "Status Keluarga": "statusKeluarga", "Baptis": "baptis", "Nama Gereja Baptis": "gerejaBaptis", "Tanggal Baptis": "tanggalBaptis", "Pendeta yang Baptis": "pendetaBaptis", "Sudah Sidi": "sidi", "Nama Gereja Sidi": "gerejaSidi", "Tanggal Sidi": "tanggalSidi", "Pendeta yang Sidi": "pendetaSidi", "Sudah Nikah": "nikah", "Nama Gereja Pemberkatan Nikah": "gerejaNikah", "Tanggal Pemberkatan Nikah": "tanggalNikah", "Pendeta yang Berkat Nikah": "pendetaNikah", "Jenis Nikah": "jenisNikah", "Pendidikan": "pendidikan", "Pekerjaan": "pekerjaan", "Penghasilan": "penghasilan", "Asuransi Kesehatan": "asuransi", "Jaminan": "jaminan", "Janda/Duda": "jandaDuda", "Yatim Piatu": "yatimPiatu", "Yatim/Piatu": "yatimPiatu", "Disabilitas": "disabilitas", "Jenis Disabilitas": "jenisDisabilitas", "Jabatan dalam Jemaat": "jabatanJemaat", "Jabatan di Jemaat": "jabatanJemaat", "Jabatan dalam Masyarakat": "jabatanMasyarakat", "Jabatan di Masyarakat": "jabatanMasyarakat", "Status Keanggotaan": "statusKeanggotaan", "Tanggal Kematian": "tanggalKematian", "Tanggal Penguburan": "tanggalPenguburan", "Pindah Ke Gereja": "pindahKeJemaat", "Tanggal Pindah": "tanggalPindah", "Asal Jemaat": "asalJemaat", "Tanggal Masuk": "tanggalMasuk" };
 
@@ -51,12 +52,13 @@ const FORM_MAJELIS = [
 ];
 
 const JEMAAT_FIELDS_PRIBADI = [
-  { name: 'noAnggota', label: 'No Anggota Keluarga Ke-', type: 'select', req: true, opts: [] }, // Opts di-inject dinamis
+  { name: 'noAnggota', label: 'No Anggota Keluarga Ke-', type: 'select', req: true, opts: [] },
   { name: 'namaLengkap', label: 'Nama Lengkap', req: true }, { name: 'nik', label: 'NIK' }, { name: 'jk', label: 'Jenis Kelamin', type: 'select', opts: ['Laki-laki', 'Perempuan'] },
   { name: 'goldar', label: 'Golongan Darah', type: 'select', opts: ['A', 'B', 'AB', 'O', 'Tidak Tahu'] }, { name: 'tempatLahir', label: 'Tempat Lahir' }, { name: 'tanggalLahir', label: 'Tanggal Lahir', type: 'date' },
   { name: 'alamat', label: 'Alamat Domisili Lengkap', span: 2 }, { name: 'sukuAyah', label: 'Suku Ayah' }, { name: 'sukuIbu', label: 'Suku Ibu' },
   { name: 'statusKeluarga', label: 'Status Dalam Keluarga', type: 'select', span: 2, opts: ['Kepala Keluarga', 'Istri', 'Anak kandung', 'Anak Angkat/asuh', 'Orangtua/Mertua', 'Kakek/Nenek', 'Saudara/Adik/Kakak', 'Cucu', 'Keponakan', 'Menantu', 'Famili/ipar', 'Lain-lain/Kost/Karyawan/Pembantu'] }
 ];
+
 const JEMAAT_EDU = [
   { name: 'pendidikan', label: 'Pendidikan', type: 'select', opts: ['Tidak/Belum Sekolah', 'Tidak Tamat SD', 'SD', 'SMP/sederajat', 'SMA/sederajat', 'D I', 'D II', 'D III', 'D IV', 'S1', 'S2', 'S3'] },
   { name: 'pekerjaan', label: 'Pekerjaan', type: 'select', opts: PEKERJAAN_LIST }, { name: 'penghasilan', label: 'Penghasilan', type: 'select', opts: ['Tidak/belum ada penghasilan', 'dibawah Rp. 1 juta', 'Rp. 1 juta s/d Rp. 2.5 juta', 'Rp. 2.5 juta s/d Rp. 5 juta', 'diatas Rp. 5 juta'] }
@@ -77,6 +79,7 @@ function calculateAge(dob) {
   if (dob.includes('-')) { const p = dob.split('-'); bd = new Date(p[0], p[1]-1, p[2]); } 
   else if (dob.includes('/')) { const p = dob.split('/'); bd = new Date(p[2], p[1]-1, p[0]); }
   else return 0;
+  
   if (isNaN(bd.getTime())) return 0;
   const td = new Date(); let age = td.getFullYear() - bd.getFullYear();
   if (td.getMonth() < bd.getMonth() || (td.getMonth() === bd.getMonth() && td.getDate() < bd.getDate())) age--;
@@ -85,8 +88,10 @@ function calculateAge(dob) {
 
 function parseCSV(str) {
   str = String(str).replace(/^\uFEFF/, ''); 
-  const res = []; let row = [], cell = '', inQ = false;
+  const res = [];
+  let row = [], cell = '', inQ = false;
   const delim = (str.split('\n')[0].split(';').length > str.split('\n')[0].split(',').length) ? ';' : ',';
+  
   for (let i = 0; i < str.length; i++) {
     const c = str[i];
     if (c === '"') { if (i+1 < str.length && str[i+1] === '"') { cell += '"'; i++; } else inQ = !inQ; } 
@@ -111,7 +116,8 @@ const getFormatDate = () => { const d = new Date(); return `${pad0(d.getDate())}
 
 const isMatchKat = (d, kat) => {
   if (kat === 'Semua Kategori') return true;
-  const a = calculateAge(d.tanggalLahir); const l = isL(d.jk); const p = isP(d.jk);
+  const a = calculateAge(d.tanggalLahir); const l = isL(d.jk);
+  const p = isP(d.jk);
   switch(kat) {
     case "Lansia Laki-laki (>= 60 tahun)": return l && a >= 60;
     case "Lansia Perempuan (>= 60 tahun)": return p && a >= 60;
@@ -198,7 +204,8 @@ function InfografisTab({ data, filterRayon, type }) {
         const l = d.filter(x => isL(x.jk)).length; const p = d.filter(x => isP(x.jk)).length;
         return { l, p, t: l + p };
      };
-     const sPen = countStats('Penatua'); const sDia = countStats('Diaken'); const sPeng = countStats('Pengajar');
+     const sPen = countStats('Penatua'); const sDia = countStats('Diaken');
+     const sPeng = countStats('Pengajar');
      return (
         <div className="p-4 animate-in fade-in duration-300">
            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -239,18 +246,22 @@ function InfografisTab({ data, filterRayon, type }) {
   );
 }
 
-function PrintKkTemplate({ kkToPrint, jemaatData, penatuaMap, onBack }) {
+function PrintKkTemplate({ kkToPrint, jemaatData, penatuaMap, profilGereja, onBack }) {
   if (!kkToPrint) return null;
   const dataKk = jemaatData.find(d => d.idKk === kkToPrint && d.statusKeluarga === 'Kepala Keluarga');
   const anggotaKk = jemaatData.filter(d => d.idKk === kkToPrint && d.statusKeanggotaan !== 'Meninggal' && d.statusKeanggotaan !== 'Pindah').sort((a,b) => parseInt(a.noAnggota) - parseInt(b.noAnggota));
+  
   if (!dataKk) return null;
   const b = "border border-black p-1";
-
+  
   return (
     <div className="w-full bg-white text-black p-4 text-[11px] font-sans">
        <style type="text/css">{`@page { size: landscape; margin: 10mm; }`}</style>
        <div className="flex justify-between items-center mb-4 border-b-2 border-black pb-2">
-          <div><h1 className="text-xl font-bold uppercase tracking-wider">GEREJA MASEHI INJILI DI TIMOR (GMIT)</h1><h2 className="text-lg font-bold uppercase">DATA JEMAAT GMIT - SILOFETOMONE</h2></div>
+          <div>
+              <h1 className="text-xl font-bold uppercase tracking-wider">{profilGereja?.sinode || 'GEREJA MASEHI INJILI DI TIMOR (GMIT)'}</h1>
+              <h2 className="text-lg font-bold uppercase">DATA JEMAAT {profilGereja?.jemaat || ''}</h2>
+          </div>
           <div className="text-right"><img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-16 h-16 object-contain" /></div>
        </div>
        <div className="grid grid-cols-3 gap-2 mb-4 text-xs">
@@ -260,9 +271,15 @@ function PrintKkTemplate({ kkToPrint, jemaatData, penatuaMap, onBack }) {
             <div className="flex"><span className="w-32 font-bold">Bentuk Rumah</span><span>: {safeStr(dataKk.bentukRumah)}</span></div>
             <div className="flex"><span className="w-32 font-bold">Status Rumah</span><span>: {safeStr(dataKk.statusRumah)}</span></div>
           </div>
-          <div><div className="flex"><span className="w-32 font-bold">Alamat Rayon</span><span>: Rayon {safeStr(dataKk.noRayon)}</span></div><div className="flex"><span className="w-32 font-bold">Alamat Domisili</span><span>: {safeStr(dataKk.alamat)}</span></div></div>
-          <div><div className="flex justify-end"><span className="w-24 font-bold text-right">No. KK</span><span>: {safeStr(dataKk.idKk)}</span></div></div>
+          <div>
+            <div className="flex"><span className="w-32 font-bold">Alamat Rayon</span><span>: Rayon {safeStr(dataKk.noRayon)}</span></div>
+            <div className="flex"><span className="w-32 font-bold">Alamat Domisili</span><span>: {safeStr(dataKk.alamat)}</span></div>
+          </div>
+          <div>
+            <div className="flex justify-end"><span className="w-24 font-bold text-right">No. KK</span><span>: {safeStr(dataKk.idKk)}</span></div>
+          </div>
        </div>
+       
        <h3 className="font-bold text-sm mb-1 uppercase bg-gray-200 p-1 text-center border border-black">Tabel 1: Identitas Umum</h3>
        <table className="w-full border-collapse border border-black mb-4 text-[10px] text-center">
           <thead><tr className="bg-gray-100"><th className={b}>NO</th><th className={b}>NAMA LENGKAP</th><th className={b}>NIK</th><th className={b}>JK</th><th className={b}>TEMPAT LAHIR</th><th className={b}>TGL LAHIR</th><th className={b}>DOMISILI</th><th className={b}>PENDIDIKAN</th><th className={b}>PEKERJAAN</th><th className={b}>PENGHASILAN</th><th className={b}>GOL DARAH</th><th className={b}>ASURANSI KES</th><th className={b}>DISABILITAS</th></tr></thead>
@@ -278,9 +295,10 @@ function PrintKkTemplate({ kkToPrint, jemaatData, penatuaMap, onBack }) {
              ))}
           </tbody>
        </table>
+       
        <h3 className="font-bold text-sm mb-1 uppercase bg-gray-200 p-1 text-center border border-black">Tabel 2: Riwayat Agama & Keluarga</h3>
        <table className="w-full border-collapse border border-black mb-6 text-[10px] text-center">
-          <thead><tr className="bg-gray-100"><th className={b}>NO</th><th className={b}>TEMPAT BAPTIS</th><th className={b}>TGL BAPTIS</th><th className={b}>PENDETA BAPTIS</th><th className={b}>TEMPAT SIDI</th><th className={b}>TGL SIDI</th><th className={b}>PENDETA SIDI</th><th className={b}>TEMPAT NIKAH</th><th className={b}>TGL NIKAH</th><th className={b}>PENDETA NIKAH</th><th className={b}>JENIS NIKAH</th><th className={b}>STATUS KELUARGA</th><th className={b}>JANDA/YATIM</th><th className={b}>JABATAN JEMAAT</th></tr></thead>
+          <thead><tr className="bg-gray-100"><th className={b}>NO</th><th className={b}>TEMPAT BAPTIS</th><th className={b}>TGL BAPTIS</th><th className={b}>PENDETA BAPTIS</th><th className={b}>TEMPAT SIDI</th><th className={b}>TGL SIDI</th><th className={b}>PENDETA SIDI</th><th className={b}>TEMPAT NIKAH</th><th className={b}>TGL NIKAH</th><th className={b}>PENDETA NIKAH</th><th className={b}>JENIS NIKAH</th><th className={b}>STATUS KELUARGA</th><th className={b}>JANDA/YATIM</th><th className={b}>JABATAN JEMAAT</th><th className={b}>JABATAN MASYARAKAT</th></tr></thead>
           <tbody>
              {anggotaKk.map((ang, i) => (
                 <tr key={i}>
@@ -288,7 +306,7 @@ function PrintKkTemplate({ kkToPrint, jemaatData, penatuaMap, onBack }) {
                    <td className={b}>{safeStr(ang.gerejaSidi)}</td><td className={b}>{toDisplayDate(ang.tanggalSidi)}</td><td className={b}>{safeStr(ang.pendetaSidi)}</td>
                    <td className={b}>{safeStr(ang.gerejaNikah)}</td><td className={b}>{toDisplayDate(ang.tanggalNikah)}</td><td className={b}>{safeStr(ang.pendetaNikah)}</td>
                    <td className={b}>{Array.isArray(ang.jenisNikah) ? ang.jenisNikah.join(', ') : safeStr(ang.jenisNikah)}</td><td className={b}>{safeStr(ang.statusKeluarga)}</td><td className={b}>{(ang.jandaDuda && ang.jandaDuda !== 'Tidak' && ang.jandaDuda !== '') ? safeStr(ang.jandaDuda) : ((ang.yatimPiatu && ang.yatimPiatu !== 'Tidak') ? safeStr(ang.yatimPiatu) : '-')}</td>
-                   <td className={b}>{safeStr(ang.jabatanJemaat)}</td>
+                   <td className={b}>{safeStr(ang.jabatanJemaat)}</td><td className={b}>{safeStr(ang.jabatanMasyarakat)}</td>
                 </tr>
              ))}
           </tbody>
@@ -311,7 +329,7 @@ function PrintKkTemplate({ kkToPrint, jemaatData, penatuaMap, onBack }) {
   );
 }
 
-function PrintMajelisTemplate({ majelisToPrint, majelisData, penatuaMap, onBack }) {
+function PrintMajelisTemplate({ majelisToPrint, majelisData, penatuaMap, profilGereja, onBack }) {
   if (!majelisToPrint) return null;
   const mj = majelisData.find(m => m.dbId === majelisToPrint);
   if (!mj) return null;
@@ -321,7 +339,7 @@ function PrintMajelisTemplate({ majelisToPrint, majelisData, penatuaMap, onBack 
   return (
     <div className="w-full bg-white text-black p-8 text-sm font-sans max-w-4xl mx-auto border shadow-lg print:border-none print:shadow-none print:m-0 print:p-0">
        <style type="text/css">{`@page { size: portrait; margin: 15mm; }`}</style>
-       <div className="text-center mb-6 border-b-4 border-double border-black pb-4"><img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-20 h-20 mx-auto mb-2" /><h1 className="text-2xl font-black uppercase">PROFIL PELAYAN / MAJELIS JEMAAT</h1><h2 className="text-lg font-bold uppercase">SILOFETOMONE - RAYON {safeStr(mj.noRayon)}</h2></div>
+       <div className="text-center mb-6 border-b-4 border-double border-black pb-4"><img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-20 h-20 mx-auto mb-2" /><h1 className="text-2xl font-black uppercase">PROFIL PELAYAN / MAJELIS JEMAAT</h1><h2 className="text-lg font-bold uppercase">{profilGereja?.jemaat || ''} - RAYON {safeStr(mj.noRayon)}</h2></div>
        <div className="flex gap-8 mb-6">
           <div className="w-1/4">
              <div className="w-32 h-40 border-2 border-black p-1 bg-gray-50 flex items-center justify-center overflow-hidden">
@@ -375,7 +393,7 @@ function PrintMajelisTemplate({ majelisToPrint, majelisData, penatuaMap, onBack 
        </div>
        
        <div className="mt-10 text-right pr-8 text-sm">
-          <p className="mb-16">SILOFETOMONE, {getFormatDate()}</p>
+          <p className="mb-16 uppercase">{profilGereja?.jemaat || ''}, {getFormatDate()}</p>
           <p className="font-bold underline uppercase">{safeStr(mj.namaLengkap)}</p>
           <p>Pelayan / Majelis</p>
        </div>
@@ -387,7 +405,7 @@ function PrintMajelisTemplate({ majelisToPrint, majelisData, penatuaMap, onBack 
   );
 }
 
-function PrintListTemplate({ listToPrint, tabCols, filteredData, filterRayon, filterKategori, onBack }) {
+function PrintListTemplate({ listToPrint, tabCols, filteredData, filterRayon, filterKategori, profilGereja, onBack }) {
   if (!listToPrint) return null;
   const b = "border border-black p-2";
 
@@ -397,7 +415,7 @@ function PrintListTemplate({ listToPrint, tabCols, filteredData, filterRayon, fi
        <div className="text-center mb-6 border-b-4 border-double border-black pb-4">
           <img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-20 h-20 mx-auto mb-2" />
           <h1 className="text-2xl font-black uppercase">LAPORAN DATA {safeStr(listToPrint).toUpperCase()}</h1>
-          <h2 className="text-lg font-bold uppercase">SILOFETOMONE</h2>
+          <h2 className="text-lg font-bold uppercase">{profilGereja?.jemaat || ''}</h2>
           <p className="font-semibold mt-2">Filter: Rayon {safeStr(filterRayon)} {listToPrint === 'Pelayanan Kategori' ? `| Kategori: ${safeStr(filterKategori)}` : ''}</p>
        </div>
        <table className="w-full border-collapse border border-black text-xs text-center mb-8">
@@ -417,19 +435,19 @@ function PrintListTemplate({ listToPrint, tabCols, filteredData, filterRayon, fi
              {(!filteredData || filteredData.length === 0) && (<tr><td colSpan={tabCols.length+1} className="border border-black p-4 italic text-gray-500">Tidak ada data.</td></tr>)}
           </tbody>
        </table>
-       <div className="flex justify-end mt-10 pr-8 text-sm"><div className="text-center"><p className="mb-16">SILOFETOMONE, {getFormatDate()}</p><p className="font-bold underline uppercase">Majelis Jemaat</p></div></div>
+       <div className="flex justify-end mt-10 pr-8 text-sm"><div className="text-center"><p className="mb-16 uppercase">{profilGereja?.jemaat || ''}, {getFormatDate()}</p><p className="font-bold underline uppercase">Majelis Jemaat</p></div></div>
        <div className="flex items-center justify-center mt-8 gap-4 no-print"><button onClick={() => window.print()} className="px-4 py-2 bg-blue-600 font-bold text-white rounded shadow">🖨️ Tekan Untuk Cetak Kertas Ini</button><button onClick={onBack} className="px-4 py-2 bg-gray-500 font-bold text-white rounded shadow"><ArrowLeft className="w-4 h-4 inline mr-2"/> Kembali</button></div>
     </div>
   );
 }
 
 // --- LOGIN SCREEN ---
-function LoginScreen({ onLogin, penatuaMap, penatuaPassMap }) {
+function LoginScreen({ onLogin, penatuaMap, penatuaPassMap, profilGereja }) {
   const [role, setRole] = useState('jemaat');
   const [selectedRayon, setSelectedRayon] = useState('1');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
-
+  
   const handleLogin = (e) => {
     e.preventDefault(); setErrorMsg('');
     if (role === 'admin' && password !== 'admin123') return setErrorMsg('Password Admin salah!');
@@ -446,7 +464,7 @@ function LoginScreen({ onLogin, penatuaMap, penatuaPassMap }) {
         <div className="flex flex-col items-center mb-8">
           <img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-24 h-24 mb-4 bg-white rounded-full shadow-sm p-1" />
           <h1 className="text-2xl font-black text-gray-800 text-center tracking-tight">Sistem Informasi</h1>
-          <p className="text-gray-500 font-medium">SILOFETOMONE</p>
+          <p className="text-gray-500 font-medium text-center uppercase">{profilGereja?.jemaat || 'SILOFETOMONE'}</p>
         </div>
         {errorMsg && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 font-semibold text-center">{errorMsg}</div>}
         <form onSubmit={handleLogin} className="space-y-4">
@@ -463,12 +481,13 @@ function LoginScreen({ onLogin, penatuaMap, penatuaPassMap }) {
 // --- APP UTAMA ---
 export default function App() {
   const [firebaseUser, setFirebaseUser] = useState(null);
-  const [appUser, setAppUser] = useState(null); 
+  const [appUser, setAppUser] = useState(null);
   const [jemaatData, setJemaatData] = useState([]);
   const [majelisData, setMajelisData] = useState([]);
   const [historyData, setHistoryData] = useState([]);
   const [penatuaMap, setPenatuaMap] = useState(DEFAULT_PENATUA);
   const [penatuaPassMap, setPenatuaPassMap] = useState({});
+  const [profilGereja, setProfilGereja] = useState(DEFAULT_PROFIL);
   const [isLoading, setIsLoading] = useState(true);
   const fileInputRef = useRef(null);
   
@@ -481,7 +500,6 @@ export default function App() {
   const [filterKategori, setFilterKategori] = useState('Semua Kategori');
   const [filterBulan, setFilterBulan] = useState(new Date().getMonth() + 1);
   const [filterHistoryAction, setFilterHistoryAction] = useState('Semua');
-  
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
@@ -490,13 +508,12 @@ export default function App() {
 
   const [modalMode, setModalMode] = useState(''); 
   const [formData, setFormData] = useState({});
-
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
   const [alertDialog, setAlertDialog] = useState({ isOpen: false, title: '', message: '' });
   const [showMenuOps, setShowMenuOps] = useState(false);
-
+  
   const showAlert = (title, message) => setAlertDialog({ isOpen: true, title, message });
-
+  
   useEffect(() => {
     const initAuth = async () => {
       try { await signInAnonymously(auth); } catch (error) {}
@@ -504,7 +521,7 @@ export default function App() {
     initAuth();
     return onAuthStateChanged(auth, setFirebaseUser);
   }, []);
-
+  
   useEffect(() => {
     if (!firebaseUser) return;
     setIsLoading(true);
@@ -513,28 +530,29 @@ export default function App() {
     const u3 = onSnapshot(collection(db, 'history'), (s) => setHistoryData(s.docs.map(d => ({ dbId: d.id, ...d.data() })).sort((a,b)=>b.timestamp - a.timestamp)));
     const u4 = onSnapshot(doc(db, 'settings', 'penatua_config'), (d) => { if(d.exists()) setPenatuaMap(d.data()); });
     const u5 = onSnapshot(doc(db, 'settings', 'penatua_pass'), (d) => { if(d.exists()) setPenatuaPassMap(d.data()); });
-    return () => { u1(); u2(); u3(); u4(); u5(); };
+    const u6 = onSnapshot(doc(db, 'settings', 'profil_gereja'), (d) => { if(d.exists()) setProfilGereja(d.data()); });
+  
+    return () => { u1(); u2(); u3(); u4(); u5(); u6(); };
   }, [firebaseUser]);
-
+  
   const rayonList = useMemo(() => Object.keys(penatuaMap).sort((a,b)=>parseInt(a)-parseInt(b)), [penatuaMap]);
   const canEdit = (row) => appUser?.role === 'admin' || (appUser?.role === 'penatua' && (!row || String(row.noRayon) === Object.keys(penatuaMap).find(key => penatuaMap[key] === appUser.name)));
-
-  // FITUR 1: PERBAIKAN ANTI CRASH (Optional Chaining & Fallback) untuk Urutan KK
+  
   const urutanKkOpts = useMemo(() => {
     if (!formData?.noRayon) return Array.from({length:30},(_,i)=>i+1);
     const usedUrutanKkNum = (jemaatData || []).filter(d => d.noRayon === formData.noRayon && d.statusKeluarga === 'Kepala Keluarga' && d.dbId !== formData?.dbId).map(d => parseInt(d.urutanKk)).filter(n => !isNaN(n));
     return Array.from({length:100},(_,i)=>i+1).filter(n => !usedUrutanKkNum.includes(n));
   }, [formData?.noRayon, formData?.dbId, jemaatData]);
-
-  // FITUR 1: PERBAIKAN ANTI CRASH (Optional Chaining & Fallback) untuk No Anggota
+  
   const noAnggotaOpts = useMemo(() => {
     if (!formData?.idKk) return Array.from({length:30},(_,i)=>i+1);
     const usedNoAnggotaNum = (jemaatData || []).filter(d => d.idKk === formData.idKk && d.dbId !== formData?.dbId).map(d => parseInt(d.noAnggota)).filter(n => !isNaN(n));
     return Array.from({length:30},(_,i)=>i+1).filter(n => !usedNoAnggotaNum.includes(n));
   }, [formData?.idKk, formData?.dbId, jemaatData]);
-
+  
   const recordHistory = async (action, col, target) => {
-    try { await addDoc(collection(db, 'history'), { action, collection: col, target: target || 'Data', user: appUser?.name || appUser?.role || 'System', timestamp: Date.now() }); } catch(e) {}
+    try { await addDoc(collection(db, 'history'), { action, collection: col, target: target || 'Data', user: appUser?.name || appUser?.role || 'System', timestamp: Date.now() });
+    } catch(e) {}
   };
 
   const handleRestoreData = (row) => {
@@ -570,7 +588,6 @@ export default function App() {
     const isMajelis = activeTab === 'Profil Majelis';
     const typeName = isMajelis ? 'majelis' : 'jemaat';
     let t = `<html xmlns:x="urn:schemas-microsoft-com:office:excel"><body><table border="1">`;
-    
     if (isMajelis) {
         t += `<tr>${MAJELIS_HEADERS.map(h => `<th style="background-color:#9C27B0;color:white;">${h}</th>`).join('')}</tr>`;
         [...majelisData].forEach(d => {
@@ -588,10 +605,10 @@ export default function App() {
     }
     
     t += `</table></body></html>`;
-    const blob = new Blob([t], { type: "application/vnd.ms-excel" }); const l = document.createElement("a"); l.href = URL.createObjectURL(blob); l.download = `Data_${typeName}_SILOFETOMONE.xls`; document.body.appendChild(l); l.click(); document.body.removeChild(l);
+    const blob = new Blob([t], { type: "application/vnd.ms-excel" }); const l = document.createElement("a"); l.href = URL.createObjectURL(blob); l.download = `Data_${typeName}_${(profilGereja?.jemaat || 'SILOFETOMONE').replace(/\s+/g, '_')}.xls`; document.body.appendChild(l);
+    l.click(); document.body.removeChild(l);
   };
 
-  // FITUR BARU: Fungsi Khusus Export Laporan Format Sinode (Pisah Tanggal Lahir dan Format Biner Pernikahan)
   const handleExportSinode = () => {
     let t = `<html xmlns:x="urn:schemas-microsoft-com:office:excel"><body><table border="1">`;
     const sinodeHeaders = [
@@ -603,7 +620,6 @@ export default function App() {
       "Janda / Duda", "Yatim / Piatu", "Disabilitas", "Jika ya, sebutkan ragam disabilitas", "_index", "_parent_index", "Usia"
     ];
     t += `<tr>${sinodeHeaders.map(h => `<th style="background-color:#0284c7;color:white;">${h}</th>`).join('')}</tr>`;
-
     [...jemaatData].sort((a,b) => (a.noRayon||'').localeCompare(b.noRayon||'') || (a.idKk||'').localeCompare(b.idKk||'')).forEach(d => {
       let hari = '', bulan = '', tahun = '';
       if (d.tanggalLahir) {
@@ -630,18 +646,19 @@ export default function App() {
     });
     
     t += `</table></body></html>`;
-    const blob = new Blob([t], { type: "application/vnd.ms-excel" }); 
+    const blob = new Blob([t], { type: "application/vnd.ms-excel" });
     const l = document.createElement("a"); l.href = URL.createObjectURL(blob); 
-    l.download = `Data_Laporan_Sinode_SILOFETOMONE.xls`; 
+    l.download = `Data_Laporan_Sinode_${(profilGereja?.jemaat || 'SILOFETOMONE').replace(/\s+/g, '_')}.xls`; 
     document.body.appendChild(l); l.click(); document.body.removeChild(l);
   };
-
+  
   const handleImportCSV = async (e) => {
     const file = e.target.files[0]; if (!file) return;
     const isMajelis = activeTab === 'Profil Majelis';
     const typeName = isMajelis ? 'majelis' : 'jemaat';
     
-    setIsLoading(true); const reader = new FileReader();
+    setIsLoading(true);
+    const reader = new FileReader();
     reader.onload = async (event) => {
       const rows = parseCSV(event.target.result);
       if (rows.length < 2) { showAlert("Error", "Format CSV salah."); setIsLoading(false); return; }
@@ -674,7 +691,7 @@ export default function App() {
            if(isMajelis) {
                if(MAJELIS_HEADER_MAP[h]) { 
                    const safeKey = MAJELIS_HEADER_MAP[h].replace(/[~*/\[\]]/g, '');
-                   if(safeKey === 'statusMenikah') d[safeKey] = v.split(',').map(s=>s.trim()); else d[safeKey] = v; 
+                   if(safeKey === 'statusMenikah') d[safeKey] = v.split(',').map(s=>s.trim()); else d[safeKey] = v;
                } else {
                   const m = h.match(/(.+) Anak (\d)/);
                   if(m && (parseInt(m[2])-1)>=0 && (parseInt(m[2])-1)<6) {
@@ -729,14 +746,14 @@ export default function App() {
          }
       });
       if (id) { 
-          await updateDoc(doc(db, collectionName, id), cleanData); 
+          await updateDoc(doc(db, collectionName, id), cleanData);
           recordHistory('EDIT', collectionName, cleanData.namaLengkap || cleanData.kepalaKeluarga || id); 
       } else { 
-          await addDoc(collection(db, collectionName), cleanData); 
+          await addDoc(collection(db, collectionName), cleanData);
           recordHistory('TAMBAH', collectionName, cleanData.namaLengkap || cleanData.kepalaKeluarga || 'Data Baru'); 
       }
     } catch (error) { 
-      showAlert("Error", "Gagal menyimpan data."); 
+      showAlert("Error", "Gagal menyimpan data.");
     }
   };
 
@@ -755,12 +772,11 @@ export default function App() {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     const dataToSave = { ...formData }; const docId = dataToSave.dbId; delete dataToSave.dbId;
-
+    
     if (modalMode === 'addKk' || modalMode === 'editKk') {
       dataToSave.namaLengkap = dataToSave.kepalaKeluarga;
       dataToSave.statusKeluarga = 'Kepala Keluarga';
       
-      // FITUR MAGIC LOGIC UPDATE KELUARGA MASSAL
       if (modalMode === 'editKk') {
           const originalKkData = jemaatData.find(d => d.dbId === docId);
           const oldIdKk = originalKkData?.idKk;
@@ -791,11 +807,13 @@ export default function App() {
     else if (modalMode === 'addPindah') await saveDocument('jemaat', { statusKeanggotaan: 'Pindah', pindahKeJemaat: dataToSave.pindahKeJemaat, tanggalPindah: dataToSave.tanggalPindah }, dataToSave.jemaatDbId);
     else if (modalMode === 'addPindahMasuk') await saveDocument('jemaat', { asalJemaat: dataToSave.asalJemaat, tanggalMasuk: dataToSave.tanggalMasuk }, dataToSave.jemaatDbId);
     else { dataToSave.statusKeanggotaan = dataToSave.statusKeanggotaan || 'Aktif'; await saveDocument('jemaat', dataToSave, docId); }
+    
     setModalMode('');
   };
-
+  
   const handleFormChange = (e) => {
-    const { name, value } = e.target; let updates = { [name]: value };
+    const { name, value } = e.target;
+    let updates = { [name]: value };
     if (modalMode === 'addKk' || modalMode === 'editKk') {
       const ry = name === 'noRayon' ? value : formData.noRayon, ur = name === 'urutanKk' ? value : formData.urutanKk;
       if(ry && ur) updates.idKk = `KK${pad0(ry)}${pad0(ur)}`;
@@ -818,10 +836,10 @@ export default function App() {
   };
 
   const requestSort = (key) => setSortConfig({ key, direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc' });
-
+  
   const getTabHeaders = () => {
-    const r = (v) => `R-${v}`; const bld = (v) => <span className="font-bold">{v}</span>; const lp = (v) => isL(v)?'L':(isP(v)?'P':'-');
-    
+    const r = (v) => `R-${v}`;
+    const bld = (v) => <span className="font-bold">{v}</span>; const lp = (v) => isL(v)?'L':(isP(v)?'P':'-');
     if (activeTab === 'Data KK') return [
       {l:'Kepala Keluarga',k:'kepalaKeluarga', fmt:v=><span className="font-bold text-blue-700">{v}</span>},
       {l:'Nomor HP',k:'noHp'}, {l:'Bentuk Rumah',k:'bentukRumah'}, {l:'Status Rumah',k:'statusRumah', fmt:v=><span className="bg-gray-100 px-2 py-1 rounded text-xs font-semibold">{v}</span>},
@@ -881,7 +899,7 @@ export default function App() {
       d = filterHistoryAction !== 'Semua' ? historyData.filter(x => x.action === filterHistoryAction) : [...historyData];
     }
 
-    if (activeTab !== 'Riwayat Sistem' && activeTab !== 'Pengaturan Rayon' && filterRayon !== 'Semua') d = d.filter(x => String(x.noRayon) === filterRayon);
+    if (activeTab !== 'Riwayat Sistem' && activeTab !== 'Manajemen Data & Pengaturan' && filterRayon !== 'Semua') d = d.filter(x => String(x.noRayon) === filterRayon);
     if (searchTerm) { const ls = searchTerm.toLowerCase(); d = d.filter(x => Object.values(x).some(v => typeof v === 'string' && v.toLowerCase().includes(ls))); }
 
     if (sortConfig.key) {
@@ -903,10 +921,10 @@ export default function App() {
   const totalItems = filteredData.length;
   const totalPages = itemsPerPage === 'Semua' ? 1 : Math.ceil(totalItems / itemsPerPage);
   const currentData = useMemo(() => itemsPerPage === 'Semua' ? filteredData : filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage), [filteredData, currentPage, itemsPerPage]);
-
+  
   useEffect(() => { setCurrentPage(1); }, [activeTab, activeSubTabStatus, subTabJemaat, subTabMajelis, searchTerm, itemsPerPage, filterRayon, filterKategori, filterBulan, filterHistoryAction]);
 
-  if (!appUser) return <LoginScreen onLogin={setAppUser} penatuaMap={penatuaMap} penatuaPassMap={penatuaPassMap} />;
+  if (!appUser) return <LoginScreen onLogin={setAppUser} penatuaMap={penatuaMap} penatuaPassMap={penatuaPassMap} profilGereja={profilGereja} />;
 
   return (
     <div className="min-h-screen bg-gray-100 font-sans text-gray-800 pb-10">
@@ -937,7 +955,7 @@ export default function App() {
           </div>
         </div>
       )}
-      
+
       {/* MODAL FORM UMUM */}
       {modalMode && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto print:hidden">
@@ -1039,6 +1057,7 @@ export default function App() {
                       <FormInput label="Jenis Nikah" name="jenisNikah" isCheckboxGroup opts={['Nikah Adat', 'Nikah Gereja/Masehi', 'Nikah Catatan Sipil/BS', 'Luar Nikah']} dis={formData.nikah!=='Ya'} value={formData.jenisNikah} onCheckboxChange={handleCheckboxChange} span={4} />
                     </div>
                     {JEMAAT_EDU.map(f => <FormInput key={f.name} {...f} value={formData[f.name]} onChange={handleFormChange} />)}
+                    
                     <h4 className="md:col-span-2 font-bold text-gray-800 border-b pb-2 mt-4 text-lg">Kesehatan & Status Sosial</h4>
                     <FormInput label="Asuransi Kesehatan" name="asuransi" type="select" opts={['Ya','Tidak']} value={formData.asuransi} onChange={handleFormChange} />
                     <FormInput label="Jaminan" name="jaminan" type="select" opts={['BPJS/Askes','Asuransi Kesehatan lainnya']} dis={formData.asuransi!=='Ya'} value={formData.jaminan} onChange={handleFormChange} />
@@ -1048,6 +1067,7 @@ export default function App() {
                     
                     <FormInput label="Disabilitas" name="disabilitas" type="select" opts={['Ya','Tidak']} value={formData.disabilitas} onChange={handleFormChange} />
                     <FormInput label="Jenis Disabilitas" name="jenisDisabilitas" type="select" opts={['Tuna Netra', 'Tuna Rungu', 'Tuna Wicara', 'Tuna Daksa', 'Tuna Laras', 'Tuna Grahita']} dis={formData.disabilitas!=='Ya'} value={formData.jenisDisabilitas} onChange={handleFormChange} />
+                    
                     <FormInput label="Jabatan dalam Jemaat" name="jabatanJemaat" value={formData.jabatanJemaat} onChange={handleFormChange} />
                     <FormInput label="Jabatan di Masyarakat" name="jabatanMasyarakat" value={formData.jabatanMasyarakat} onChange={handleFormChange} />
                   </div>
@@ -1169,9 +1189,9 @@ export default function App() {
 
       {/* Cetakan Laporan Kertas */}
       <div className={printMode === null ? 'hidden' : 'block'}>
-         {printMode === 'kk' && <PrintKkTemplate kkToPrint={printId} jemaatData={jemaatData} penatuaMap={penatuaMap} onBack={() => setPrintMode(null)} />}
-         {printMode === 'majelis' && <PrintMajelisTemplate majelisToPrint={printId} majelisData={majelisData} penatuaMap={penatuaMap} onBack={() => setPrintMode(null)} />}
-         {printMode === 'list' && <PrintListTemplate listToPrint={activeSubTabStatus} tabCols={tabCols} filteredData={filteredData} filterRayon={filterRayon} filterKategori={filterKategori} onBack={() => setPrintMode(null)} />}
+         {printMode === 'kk' && <PrintKkTemplate kkToPrint={printId} jemaatData={jemaatData} penatuaMap={penatuaMap} profilGereja={profilGereja} onBack={() => setPrintMode(null)} />}
+         {printMode === 'majelis' && <PrintMajelisTemplate majelisToPrint={printId} majelisData={majelisData} penatuaMap={penatuaMap} profilGereja={profilGereja} onBack={() => setPrintMode(null)} />}
+         {printMode === 'list' && <PrintListTemplate listToPrint={activeSubTabStatus} tabCols={tabCols} filteredData={filteredData} filterRayon={filterRayon} filterKategori={filterKategori} profilGereja={profilGereja} onBack={() => setPrintMode(null)} />}
       </div>
 
       {/* Main UI */}
@@ -1181,14 +1201,14 @@ export default function App() {
             <img src="https://i.imgur.com/XV3hpOH.png" alt="Logo" className="w-12 h-12 object-contain bg-white rounded-full p-1 shadow-sm border border-gray-100" />
             <div>
               <h1 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Sistem Data Terpadu</h1>
-              <div className="text-xs text-blue-600 font-bold hidden md:flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div> DB Terkoneksi • Akses: <span className="uppercase">{appUser?.role}</span></div>
+              <div className="text-xs text-blue-600 font-bold hidden md:flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div> {profilGereja?.jemaat || 'SILOFETOMONE'} • Akses: <span className="uppercase">{appUser?.role}</span></div>
             </div>
           </div>
           <div className="flex items-center gap-2 lg:gap-4">
             <div className="hidden lg:flex gap-1 bg-gray-50 p-1.5 rounded-full border border-gray-200">
-              {['Data KK', 'Data Jemaat', 'Profil Majelis', 'Status Jemaat', ...(appUser?.role === 'admin' ? ['Riwayat Sistem', 'Pengaturan Rayon'] : [])].map(tab => (
+              {['Data KK', 'Data Jemaat', 'Profil Majelis', 'Status Jemaat', ...(appUser?.role === 'admin' ? ['Riwayat Sistem', 'Manajemen Data & Pengaturan'] : [])].map(tab => (
                 <button key={tab} onClick={() => {setActiveTab(tab); setSortConfig({key:null, direction:'asc'});}} className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${activeTab === tab ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}>
-                  {tab === 'Riwayat Sistem' ? <span className="flex items-center gap-1"><History className="w-4 h-4"/> Admin Log</span> : tab === 'Pengaturan Rayon' ? <span className="flex items-center gap-1"><Settings className="w-4 h-4"/> Pengaturan</span> : <span className="flex items-center gap-1">{tab === 'Profil Majelis' ? <UserCheck className="w-4 h-4"/> : null} {tab}</span>}
+                  {tab === 'Riwayat Sistem' ? <span className="flex items-center gap-1"><History className="w-4 h-4"/> Admin Log</span> : tab === 'Manajemen Data & Pengaturan' ? <span className="flex items-center gap-1"><Settings className="w-4 h-4"/> Pengaturan</span> : <span className="flex items-center gap-1">{tab === 'Profil Majelis' ? <UserCheck className="w-4 h-4"/> : null} {tab}</span>}
                 </button>
               ))}
             </div>
@@ -1199,7 +1219,7 @@ export default function App() {
 
         <main className="pt-28 px-4 md:px-8 max-w-[98%] mx-auto print:pt-4 print:px-0">
           <div className="flex lg:hidden overflow-x-auto gap-2 pb-4 mb-4 scrollbar-hide print:hidden">
-             {['Data KK', 'Data Jemaat', 'Profil Majelis', 'Status Jemaat', ...(appUser?.role === 'admin' ? ['Riwayat Sistem', 'Pengaturan Rayon'] : [])].map((tab) => (
+             {['Data KK', 'Data Jemaat', 'Profil Majelis', 'Status Jemaat', ...(appUser?.role === 'admin' ? ['Riwayat Sistem', 'Manajemen Data & Pengaturan'] : [])].map((tab) => (
               <button key={tab} onClick={() => {setActiveTab(tab); setSortConfig({key:null, direction:'asc'});}} className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition-all ${activeTab === tab ? 'bg-blue-600 text-white shadow-md' : 'bg-white border-2 text-gray-600 hover:bg-gray-100'}`}>{tab}</button>
             ))}
           </div>
@@ -1249,15 +1269,32 @@ export default function App() {
           ) : (
             <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden print:border-none print:shadow-none">
               
-              {activeTab === 'Pengaturan Rayon' ? (
+              {activeTab === 'Manajemen Data & Pengaturan' ? (
                 <div className="p-8">
+                   <div className="mb-8">
+                      <h2 className="text-2xl font-black text-gray-800 flex items-center gap-2 mb-4"><Settings className="w-6 h-6 text-gray-600"/> Profil Gereja</h2>
+                      <p className="text-gray-500 mb-4">Pengaturan ini akan diterapkan pada kop surat, cetakan dokumen, dan antarmuka aplikasi.</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-6 rounded-2xl border border-gray-200">
+                         <div><label className="text-sm font-bold text-gray-700 mb-1 block">Sinode</label><input type="text" className="w-full border-2 border-gray-300 p-2.5 rounded-xl focus:border-blue-500 outline-none text-sm" value={profilGereja.sinode||''} onChange={e => setProfilGereja({...profilGereja, sinode: e.target.value})} /></div>
+                         <div><label className="text-sm font-bold text-gray-700 mb-1 block">Klasis</label><input type="text" className="w-full border-2 border-gray-300 p-2.5 rounded-xl focus:border-blue-500 outline-none text-sm" value={profilGereja.klasis||''} onChange={e => setProfilGereja({...profilGereja, klasis: e.target.value})} /></div>
+                         <div><label className="text-sm font-bold text-gray-700 mb-1 block">Jemaat</label><input type="text" className="w-full border-2 border-gray-300 p-2.5 rounded-xl focus:border-blue-500 outline-none text-sm" value={profilGereja.jemaat||''} onChange={e => setProfilGereja({...profilGereja, jemaat: e.target.value})} /></div>
+                         <div><label className="text-sm font-bold text-gray-700 mb-1 block">Mata Jemaat</label><input type="text" className="w-full border-2 border-gray-300 p-2.5 rounded-xl focus:border-blue-500 outline-none text-sm" value={profilGereja.mataJemaat||''} onChange={e => setProfilGereja({...profilGereja, mataJemaat: e.target.value})} /></div>
+                         <div className="md:col-span-2"><label className="text-sm font-bold text-gray-700 mb-1 block">Alamat Gereja</label><input type="text" className="w-full border-2 border-gray-300 p-2.5 rounded-xl focus:border-blue-500 outline-none text-sm" value={profilGereja.alamat||''} onChange={e => setProfilGereja({...profilGereja, alamat: e.target.value})} /></div>
+                      </div>
+                      <div className="mt-4 flex justify-end">
+                         <button onClick={async () => { try { await setDoc(doc(db, 'settings', 'profil_gereja'), profilGereja, {merge:true}); showAlert("Sukses", "Profil Gereja berhasil disimpan!"); } catch(e){ showAlert("Error", "Gagal menyimpan."); } }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-xl shadow transition-all active:scale-95">Simpan Profil</button>
+                      </div>
+                   </div>
+
+                   <hr className="my-8 border-gray-200" />
+
                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                      <div><h2 className="text-2xl font-black text-gray-800 flex items-center gap-2"><Settings className="w-6 h-6 text-gray-600"/> Manajemen Nama Penatua</h2><p className="text-gray-500 mt-2">Ubah nama penatua dan atur password login khusus untuk masing-masing Rayon.</p></div>
+                      <div><h2 className="text-2xl font-black text-gray-800 flex items-center gap-2"><Users className="w-6 h-6 text-gray-600"/> Manajemen Nama Penatua</h2><p className="text-gray-500 mt-2">Ubah nama penatua dan atur password login khusus untuk masing-masing Rayon.</p></div>
                       <button onClick={() => { const max = Math.max(...Object.keys(penatuaMap).map(Number)); setPenatuaMap({...penatuaMap, [max+1]: "Penatua Baru"}); setPenatuaPassMap({...penatuaPassMap, [max+1]: "penatua123"}); }} className="bg-green-100 hover:bg-green-200 text-green-700 font-bold py-2.5 px-5 rounded-xl transition-all active:scale-95 flex items-center gap-2"><Plus className="w-5 h-5"/> Tambah Rayon Baru</button>
                    </div>
                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 bg-gray-50 p-6 rounded-2xl border border-gray-200">
                       {rayonList.map(r => (
-                        <div key={r} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm relative">
+                         <div key={r} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm relative">
                            {parseInt(r) > 6 && <button onClick={()=>{const n={...penatuaMap}; delete n[r]; setPenatuaMap(n); const p={...penatuaPassMap}; delete p[r]; setPenatuaPassMap(p);}} className="absolute top-2 right-2 p-1 text-red-400 hover:text-red-600 bg-red-50 rounded"><Trash2 className="w-4 h-4"/></button>}
                            <label className="text-sm font-bold text-gray-700 mb-1 block">Penatua Rayon {r}</label>
                            <input type="text" className="w-full border-2 border-gray-300 p-2.5 rounded-xl focus:border-blue-500 outline-none mb-4 text-sm" value={penatuaMap[r]} onChange={e => setPenatuaMap({...penatuaMap, [r]: e.target.value})} />
@@ -1267,7 +1304,7 @@ export default function App() {
                       ))}
                    </div>
                    <div className="mt-6 flex justify-end">
-                      <button onClick={async () => { try { await setDoc(doc(db, 'settings', 'penatua_config'), penatuaMap, {merge:true}); await setDoc(doc(db, 'settings', 'penatua_pass'), penatuaPassMap, {merge:true}); showAlert("Sukses", "Nama Penatua dan Password berhasil disimpan!"); } catch(e){ showAlert("Error", "Gagal menyimpan."); } }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all active:scale-95">Simpan Pengaturan</button>
+                       <button onClick={async () => { try { await setDoc(doc(db, 'settings', 'penatua_config'), penatuaMap, {merge:true}); await setDoc(doc(db, 'settings', 'penatua_pass'), penatuaPassMap, {merge:true}); showAlert("Sukses", "Nama Penatua dan Password berhasil disimpan!"); } catch(e){ showAlert("Error", "Gagal menyimpan."); } }} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all active:scale-95">Simpan Pengaturan Rayon</button>
                    </div>
                 </div>
               ) : (
@@ -1286,7 +1323,7 @@ export default function App() {
                       {activeTab === 'Data KK' && (appUser?.role === 'admin' || appUser?.role === 'penatua') && <button onClick={() => { setFormData({ penatua: appUser?.role === 'penatua' ? appUser?.name : '' }); setModalMode('addKk'); }} className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-md active:scale-95"><Plus className="w-4 h-4"/> Buat KK Baru</button>}
                       
                       {activeTab === 'Data Jemaat' && subTabJemaat !== 'Infografis' && (appUser?.role === 'admin' || appUser?.role === 'penatua') && (
-                        <button onClick={() => { setFormData({ penatua: appUser?.role === 'penatua' ? appUser?.name : '' }); setModalMode('addJemaat'); }} className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-md active:scale-95"><Plus className="w-4 h-4"/> Tambah Data Jemaat</button>
+                         <button onClick={() => { setFormData({ penatua: appUser?.role === 'penatua' ? appUser?.name : '' }); setModalMode('addJemaat'); }} className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-md active:scale-95"><Plus className="w-4 h-4"/> Tambah Data Jemaat</button>
                       )}
                       
                       {/* OPSI LAIN DATA JEMAAT HANYA UNTUK ADMIN */}
@@ -1345,7 +1382,7 @@ export default function App() {
                     <div className="hidden print:block mb-4 border-b-2 border-black pb-4">
                        <h1 className="text-2xl font-bold uppercase text-center">Data {activeTab === 'Status Jemaat' ? activeSubTabStatus : activeTab === 'Data Jemaat' ? subTabJemaat : activeTab === 'Profil Majelis' ? subTabMajelis : activeTab}</h1>
                        <p className="text-center font-bold text-sm mt-1">{activeTab === 'Status Jemaat' && activeSubTabStatus === 'Pelayanan Kategori' ? `Kategori: ${filterKategori} | ` : ''}{activeTab === 'Status Jemaat' && activeSubTabStatus === 'Ulang Tahun' ? `Bulan: ${NAMA_BULAN[filterBulan-1]} | ` : ''}Rayon: {filterRayon}</p>
-                       <p className="text-center font-medium text-sm">SILOFETOMONE</p>
+                       <p className="text-center font-medium text-sm">{profilGereja?.jemaat?.toUpperCase() || ''}</p>
                     </div>
 
                     {activeTab === 'Data Jemaat' && subTabJemaat === 'Infografis' ? (
@@ -1374,13 +1411,13 @@ export default function App() {
                                          <td className="px-4 py-3 text-center flex items-center justify-center gap-1.5 sticky right-0 bg-white/95 backdrop-blur shadow-[-4px_0_10px_-5px_rgba(0,0,0,0.05)] h-full">
                                             {activeTab === 'Status Jemaat' ? (
                                                <div className="flex flex-col gap-1 w-full">
-                                                  {['Data Kematian', 'Pindah Jemaat', 'Pindah Masuk Jemaat'].includes(activeSubTabStatus) && (
+                                                 {['Data Kematian', 'Pindah Jemaat', 'Pindah Masuk Jemaat'].includes(activeSubTabStatus) && (
                                                      <>
                                                         <button onClick={() => { setFormData(row); setModalMode('viewJemaat'); }} className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg transition flex items-center justify-center gap-1 w-full text-xs font-bold" title="Lihat Detail"><Eye className="w-3 h-3" /> Detail</button>
                                                         {/* Tarik data / batalkan kematian atau pindah, hanya untuk Admin */}
                                                         {appUser?.role === 'admin' && activeSubTabStatus !== 'Pindah Masuk Jemaat' && <button onClick={() => handleRestoreData(row)} className="p-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white rounded-lg transition flex items-center justify-center gap-1 w-full text-xs font-bold"><RefreshCw className="w-3 h-3" /> Tarik</button>}
                                                      </>
-                                                  )}
+                                                 )}
                                                </div>
                                             ) : isEditable ? (
                                               <>
@@ -1388,7 +1425,7 @@ export default function App() {
                                                 
                                                 {/* Hanya Admin yang bisa melihat tombol Hapus */}
                                                 {appUser?.role === 'admin' && (
-                                                  <button onClick={() => requestDelete(activeTab === 'Profil Majelis' ? 'majelis' : 'jemaat', row.dbId, row.namaLengkap||row.kepalaKeluarga)} className="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg transition" title="Hapus Data"><Trash2 className="w-4 h-4" /></button>
+                                                   <button onClick={() => requestDelete(activeTab === 'Profil Majelis' ? 'majelis' : 'jemaat', row.dbId, row.namaLengkap||row.kepalaKeluarga)} className="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg transition" title="Hapus Data"><Trash2 className="w-4 h-4" /></button>
                                                 )}
 
                                                 {activeTab === 'Data KK' && (
